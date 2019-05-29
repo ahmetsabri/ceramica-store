@@ -2002,6 +2002,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2013,9 +2020,10 @@ __webpack_require__.r(__webpack_exports__);
       offset: 2,
       loading: false,
       showEditDialoge: false,
+      selectedId: null,
       headers: [{
         align: 'center',
-        'text': 'مسلسل',
+        'text': 'تعديل',
         value: 'id'
       }, {
         align: 'center',
@@ -2023,7 +2031,7 @@ __webpack_require__.r(__webpack_exports__);
         value: 'name'
       }, {
         align: 'center',
-        'text': 'تعديل',
+        'text': 'مسلسل',
         value: 'id'
       }],
       marks: []
@@ -2990,9 +2998,23 @@ var render = function() {
         },
         [
           _c("v-card", [
+            _vm.showEditDialoge
+              ? _c("div", { attrs: { color: "indigo pa-4" } }, [
+                  _c("h1", { staticClass: "text-xs-center indigo--text" }, [
+                    _c("bdi", [
+                      _vm._v(
+                        "\n               تعديل ماركة : " +
+                          _vm._s(_vm.selectedId.name) +
+                          "\n\n             "
+                      )
+                    ])
+                  ])
+                ])
+              : _vm._e(),
+            _vm._v(" "),
             _c(
               "div",
-              { staticClass: "ma-3" },
+              { staticClass: "ma-3 pa-4" },
               [
                 _c(
                   "v-form",
@@ -3068,7 +3090,7 @@ var render = function() {
         },
         [
           _c("v-card", [
-            _c("div", { attrs: { color: "indigo" } }, [
+            _c("div", { attrs: { color: "indigo pa-4" } }, [
               _c("h1", { staticClass: "text-xs-center indigo--text" }, [
                 _vm._v("\n             ادخال ماركة جديدة\n           ")
               ])
@@ -3076,7 +3098,7 @@ var render = function() {
             _vm._v(" "),
             _c(
               "div",
-              { staticClass: "ma-3" },
+              { staticClass: "ma-3 pa-4" },
               [
                 _c(
                   "v-form",
@@ -3147,14 +3169,6 @@ var render = function() {
                   key: "items",
                   fn: function(props) {
                     return [
-                      _c("td", { staticClass: "text-xs-center" }, [
-                        _vm._v(_vm._s(props.index + 1))
-                      ]),
-                      _vm._v(" "),
-                      _c("td", { staticClass: "text-xs-center" }, [
-                        _vm._v(_vm._s(props.item.name))
-                      ]),
-                      _vm._v(" "),
                       _c(
                         "td",
                         { staticClass: "text-xs-center" },
@@ -3188,14 +3202,22 @@ var render = function() {
                           )
                         ],
                         1
-                      )
+                      ),
+                      _vm._v(" "),
+                      _c("td", { staticClass: "text-xs-center" }, [
+                        _vm._v(_vm._s(props.item.name))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", { staticClass: "text-xs-center" }, [
+                        _vm._v(_vm._s(props.index + 1))
+                      ])
                     ]
                   }
                 }
               ],
               null,
               false,
-              4005551901
+              1811085565
             )
           })
         : _vm._e(),

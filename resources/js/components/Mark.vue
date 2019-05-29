@@ -14,8 +14,15 @@
       max-width="500px"
       transition="dialog-transition">
         <v-card>
-          <div class="ma-3">
+          <div color="indigo pa-4" v-if="showEditDialoge">
+            <h1 class="text-xs-center indigo--text">
+              <bdi>
+                تعديل ماركة : {{selectedId.name}}
 
+              </bdi>
+            </h1>
+          </div>
+          <div class="ma-3 pa-4">
           <v-form @submit.prevent="applyEdit">
                     <v-text-field
                       v-model="markName"
@@ -37,13 +44,13 @@
         transition="dialog-transition">
         <v-card>
 
-          <div color="indigo">
+          <div color="indigo pa-4">
             <h1 class="text-xs-center indigo--text">
               ادخال ماركة جديدة
             </h1>
           </div>
 
-          <div class="ma-3">
+          <div class="ma-3 pa-4">
 
           <v-form @submit.prevent="createMark">
                     <v-text-field
@@ -67,12 +74,12 @@
         hide-actions
         >
       <template v-slot:items="props">
+        <td class="text-xs-center">
+          <v-btn small class="error" round @click="deleteMark(props.item.id)">حذف</v-btn>
+          <v-btn small class="info" round @click="editMark(props.item.id)">تعديل</v-btn>
+        </td>
+        <td class="text-xs-center">{{ props.item.name }}</td>
    <td class="text-xs-center">{{ props.index +1 }}</td>
-   <td class="text-xs-center">{{ props.item.name }}</td>
-   <td class="text-xs-center">
-     <v-btn small class="error" round @click="deleteMark(props.item.id)">حذف</v-btn>
-     <v-btn small class="info" round @click="editMark(props.item.id)">تعديل</v-btn>
-   </td>
  </template>
       </v-data-table>
 
@@ -102,10 +109,11 @@ export default {
           offset:2,
           loading:false,
           showEditDialoge:false,
+          selectedId:null,
           headers:[
-            {align:'center','text':'مسلسل',value:'id'},
+            {align:'center','text':'تعديل',value:'id'},
             {align:'center','text':'اسم الماركة',value:'name'},
-            {align:'center','text':'تعديل',value:'id'}, 
+            {align:'center','text':'مسلسل',value:'id'},
           ],
           marks:[],
         };

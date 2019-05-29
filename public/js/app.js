@@ -2043,7 +2043,7 @@ __webpack_require__.r(__webpack_exports__);
         this.markName = '';
       }
     },
-    addMarkDialog: function addMarkDialog() {
+    addMarkDialog: function addMarkDialog(n) {
       if (n == false) {
         this.markName = '';
       }
@@ -2157,6 +2157,8 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -2165,7 +2167,340 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ __webpack_exports__["default"] = ({});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      showAddModal: false,
+      showEditModal: false,
+      allMarks: [],
+      selectedMark: '',
+      selctedColor: '',
+      quantityInBox: '',
+      sizeInMeter: '',
+      priceForMeter: '',
+      selectedFilter: '',
+      done: false,
+      selectedId: null,
+      stock: [],
+      headers: [{
+        'text': 'تعديل',
+        'value': 'id',
+        'align': 'center'
+      }, {
+        'text': 'السعر للمتر',
+        'value': 'id',
+        'align': 'center'
+      }, {
+        'text': 'السعة المترية',
+        'value': 'id',
+        'align': 'center'
+      }, {
+        'text': 'الكمية',
+        'value': 'id',
+        'align': 'center'
+      }, {
+        'text': 'اللون',
+        'value': 'id',
+        'align': 'center'
+      }, {
+        'text': 'الفرزة',
+        'value': 'id',
+        'align': 'center'
+      }, {
+        'text': 'الماركة',
+        'value': 'id',
+        'align': 'center'
+      }],
+      allFilters: [{
+        'id': 1,
+        name: 'أولى'
+      }, {
+        'id': 2,
+        name: 'تانية'
+      }, {
+        'id': 3,
+        name: 'تالتة'
+      }, {
+        'id': 4,
+        name: 'رابعة'
+      }]
+    };
+  },
+  created: function created() {
+    this.loadStock();
+  },
+  methods: {
+    loadStock: function loadStock() {
+      var _this = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/read', {}).then(function (response) {
+        console.log(response.data.stock);
+        _this.allMarks = response.data.marks;
+        _this.stock = response.data.stock;
+      })["catch"](function (errors) {
+        alert('error in reading');
+        console.log(errors);
+        console.log(errors.response);
+      });
+    },
+    addStock: function addStock() {
+      var _this2 = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/create', {
+        mark_id: this.selectedMark,
+        filter_id: this.selectedFilter,
+        quantity: this.quantityInBox,
+        color: this.selctedColor,
+        size: this.sizeInMeter,
+        price: this.priceForMeter
+      }).then(function (response) {
+        console.log(response.data);
+        _this2.showAddModal = false;
+        _this2.done = true;
+      })["catch"](function (errors) {
+        console.log(errors);
+        console.log(errors.response);
+      });
+    },
+    deleteStock: function deleteStock(id) {
+      var sure = confirm('هل أنت متأكد ؟');
+
+      if (sure) {
+        alert('I will delete');
+        alert(id);
+        axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/delete', {
+          id: id
+        }).then(function (response) {
+          console.log(response.data);
+        })["catch"](function (errors) {
+          alert('خطأ في الحذف');
+          console.log(errors);
+          console.log(errors.response);
+          console.log(errors.response.data);
+        });
+      }
+    },
+    editStock: function editStock(id) {
+      var index = this.stock.findIndex(function (val) {
+        return val.id == id;
+      });
+      this.selectedId = this.stock[index];
+      this.selectedMark = this.selectedId.mark_id;
+      this.selectedFilter = this.selectedId.filter_id;
+      this.quantityInBox = this.selectedId.quantity;
+      this.selctedColor = this.selectedId.color;
+      this.sizeInMeter = this.selectedId.size;
+      this.priceForMeter = this.selectedId.price;
+      this.showEditModal = true;
+    },
+    applyEditStock: function applyEditStock() {
+      var _this3 = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/edit', {
+        mark_id: this.selectedMark,
+        filter_id: this.selectedFilter,
+        quantity: this.quantityInBox,
+        color: this.selctedColor,
+        size: this.sizeInMeter,
+        price: this.priceForMeter
+      }).then(function (response) {
+        _this3.done = true;
+      })["catch"](function (errors) {
+        alert('خطأ في التعديل');
+        console.log(errors);
+        console.log(errors.response);
+      });
+    }
+  }
+});
 
 /***/ }),
 
@@ -3279,9 +3614,442 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("v-content", [
-    _c("h1", { staticClass: "text-xs-center" }, [_vm._v("\n    Stock\n  ")])
-  ])
+  return _c(
+    "v-content",
+    [
+      _c("div", { staticClass: "text-xs-center" }, [
+        _c("h1", [_vm._v("المخزن")])
+      ]),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "text-xs-center" },
+        [
+          _c(
+            "v-btn",
+            {
+              attrs: { round: "", dark: "" },
+              on: {
+                click: function($event) {
+                  _vm.showAddModal = true
+                }
+              }
+            },
+            [
+              _c(
+                "bdi",
+                [
+                  _vm._v("\n            اضافة "),
+                  _c("v-icon", { attrs: { color: "white" } }, [_vm._v("add")])
+                ],
+                1
+              )
+            ]
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "500px", transition: "dialog-transition" },
+          model: {
+            value: _vm.showAddModal,
+            callback: function($$v) {
+              _vm.showAddModal = $$v
+            },
+            expression: "showAddModal"
+          }
+        },
+        [
+          _c("v-card", [
+            _c("div", { staticClass: "text-xs-center" }, [
+              _c("h2", [_vm._v("اضافة صنف جديد")])
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "pa-3 ma-3" },
+              [
+                _c(
+                  "v-form",
+                  [
+                    _c("v-select", {
+                      attrs: {
+                        "solo-inverted": "",
+                        items: _vm.allMarks,
+                        "item-text": "name",
+                        "item-value": "id",
+                        label: "الماركة"
+                      },
+                      model: {
+                        value: _vm.selectedMark,
+                        callback: function($$v) {
+                          _vm.selectedMark = $$v
+                        },
+                        expression: "selectedMark"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("v-select", {
+                      attrs: {
+                        "solo-inverted": "",
+                        items: _vm.allFilters,
+                        "item-text": "name",
+                        "item-value": "id",
+                        label: "الفرز"
+                      },
+                      model: {
+                        value: _vm.selectedFilter,
+                        callback: function($$v) {
+                          _vm.selectedFilter = $$v
+                        },
+                        expression: "selectedFilter"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("v-text-field", {
+                      attrs: { "solo-inverted": "", placeholder: "اللون" },
+                      model: {
+                        value: _vm.selctedColor,
+                        callback: function($$v) {
+                          _vm.selctedColor = $$v
+                        },
+                        expression: "selctedColor"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("v-text-field", {
+                      attrs: {
+                        "solo-inverted": "",
+                        placeholder: "الكمية بالكرتونة"
+                      },
+                      model: {
+                        value: _vm.quantityInBox,
+                        callback: function($$v) {
+                          _vm.quantityInBox = $$v
+                        },
+                        expression: "quantityInBox"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("v-text-field", {
+                      attrs: {
+                        "solo-inverted": "",
+                        placeholder: "السعة المترية"
+                      },
+                      model: {
+                        value: _vm.sizeInMeter,
+                        callback: function($$v) {
+                          _vm.sizeInMeter = $$v
+                        },
+                        expression: "sizeInMeter"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("v-text-field", {
+                      attrs: {
+                        "solo-inverted": "",
+                        placeholder: "السعر للمتر"
+                      },
+                      model: {
+                        value: _vm.priceForMeter,
+                        callback: function($$v) {
+                          _vm.priceForMeter = $$v
+                        },
+                        expression: "priceForMeter"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "text-xs-center" },
+                      [
+                        _c(
+                          "v-btn",
+                          {
+                            staticClass: "white--text success",
+                            attrs: { round: "" },
+                            on: { click: _vm.addStock }
+                          },
+                          [
+                            _c(
+                              "bdi",
+                              [
+                                _vm._v("\n                        اضافة "),
+                                _c("v-icon", [_vm._v("done")])
+                              ],
+                              1
+                            )
+                          ]
+                        )
+                      ],
+                      1
+                    )
+                  ],
+                  1
+                )
+              ],
+              1
+            )
+          ])
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "500px", transition: "dialog-transition" },
+          model: {
+            value: _vm.showEditModal,
+            callback: function($$v) {
+              _vm.showEditModal = $$v
+            },
+            expression: "showEditModal"
+          }
+        },
+        [
+          _c("v-card", [
+            _c("div", { staticClass: "text-xs-center" }, [
+              _c("h2", [_vm._v("اضافة صنف جديد")])
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "pa-3 ma-3" },
+              [
+                _c(
+                  "v-form",
+                  [
+                    _c("v-select", {
+                      attrs: {
+                        "solo-inverted": "",
+                        items: _vm.allMarks,
+                        "item-text": "name",
+                        "item-value": "id",
+                        label: "الماركة"
+                      },
+                      model: {
+                        value: _vm.selectedMark,
+                        callback: function($$v) {
+                          _vm.selectedMark = $$v
+                        },
+                        expression: "selectedMark"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("v-select", {
+                      attrs: {
+                        "solo-inverted": "",
+                        items: _vm.allFilters,
+                        "item-text": "name",
+                        "item-value": "id",
+                        label: "الفرز"
+                      },
+                      model: {
+                        value: _vm.selectedFilter,
+                        callback: function($$v) {
+                          _vm.selectedFilter = $$v
+                        },
+                        expression: "selectedFilter"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("v-text-field", {
+                      attrs: { "solo-inverted": "", placeholder: "اللون" },
+                      model: {
+                        value: _vm.selctedColor,
+                        callback: function($$v) {
+                          _vm.selctedColor = $$v
+                        },
+                        expression: "selctedColor"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("v-text-field", {
+                      attrs: {
+                        "solo-inverted": "",
+                        placeholder: "الكمية بالكرتونة"
+                      },
+                      model: {
+                        value: _vm.quantityInBox,
+                        callback: function($$v) {
+                          _vm.quantityInBox = $$v
+                        },
+                        expression: "quantityInBox"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("v-text-field", {
+                      attrs: {
+                        "solo-inverted": "",
+                        placeholder: "السعة المترية"
+                      },
+                      model: {
+                        value: _vm.sizeInMeter,
+                        callback: function($$v) {
+                          _vm.sizeInMeter = $$v
+                        },
+                        expression: "sizeInMeter"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("v-text-field", {
+                      attrs: {
+                        "solo-inverted": "",
+                        placeholder: "السعر للمتر"
+                      },
+                      model: {
+                        value: _vm.priceForMeter,
+                        callback: function($$v) {
+                          _vm.priceForMeter = $$v
+                        },
+                        expression: "priceForMeter"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "text-xs-center" },
+                      [
+                        _c(
+                          "v-btn",
+                          {
+                            staticClass: "white--text success",
+                            attrs: { round: "" },
+                            on: { click: _vm.applyEditStock }
+                          },
+                          [
+                            _c(
+                              "bdi",
+                              [
+                                _vm._v("\n                        حفظ "),
+                                _c("v-icon", [_vm._v("done")])
+                              ],
+                              1
+                            )
+                          ]
+                        )
+                      ],
+                      1
+                    )
+                  ],
+                  1
+                )
+              ],
+              1
+            )
+          ])
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c("v-data-table", {
+        staticClass: "elevation-1",
+        attrs: { headers: _vm.headers, items: _vm.stock, "hide-actions": "" },
+        scopedSlots: _vm._u([
+          {
+            key: "items",
+            fn: function(props) {
+              return [
+                _c(
+                  "td",
+                  { staticClass: "text-xs-center" },
+                  [
+                    _c(
+                      "v-btn",
+                      {
+                        attrs: { round: "", small: "", color: "error" },
+                        on: {
+                          click: function($event) {
+                            return _vm.deleteStock(props.item.id)
+                          }
+                        }
+                      },
+                      [_vm._v(" حذف ")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      {
+                        attrs: { round: "", small: "", color: "info" },
+                        on: {
+                          click: function($event) {
+                            return _vm.editStock(props.item.id)
+                          }
+                        }
+                      },
+                      [_vm._v(" تعديل ")]
+                    )
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-xs-center" }, [
+                  _vm._v(_vm._s(props.item.price))
+                ]),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-xs-center" }, [
+                  _vm._v(_vm._s(props.item.size))
+                ]),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-xs-center" }, [
+                  _vm._v(_vm._s(props.item.quantity))
+                ]),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-xs-center" }, [
+                  _vm._v(_vm._s(props.item.color))
+                ]),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-xs-center" }, [
+                  _vm._v(_vm._s(props.item.filter_id))
+                ]),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-xs-center" }, [
+                  _vm._v(_vm._s(props.item.mark_id))
+                ])
+              ]
+            }
+          }
+        ])
+      }),
+      _vm._v(" "),
+      _c(
+        "v-snackbar",
+        {
+          attrs: { bottom: "", right: "" },
+          model: {
+            value: _vm.done,
+            callback: function($$v) {
+              _vm.done = $$v
+            },
+            expression: "done"
+          }
+        },
+        [
+          _c("b", [_vm._v("\n         تم بنجاح\n       ")]),
+          _vm._v(" "),
+          _c(
+            "v-btn",
+            {
+              staticClass: "green--text",
+              attrs: { flat: "", dark: "" },
+              nativeOn: {
+                click: function($event) {
+                  _vm.done = false
+                }
+              }
+            },
+            [_vm._v("حسناً")]
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true

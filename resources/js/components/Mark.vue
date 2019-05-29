@@ -125,7 +125,7 @@ export default {
         this.markName = '';
       }
     },
-    addMarkDialog(){
+    addMarkDialog(n){
       if (n == false) {
         this.markName = '';
 

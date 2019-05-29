@@ -15,6 +15,8 @@ class CreateStocksTable extends Migration
             $table->string('color');
             $table->decimal('quantity');
             $table->decimal('size');
+            $table->decimal('price');
+
             $table->timestamps();
         });
     }

@@ -105,7 +105,7 @@ export default {
           headers:[
             {align:'center','text':'مسلسل',value:'id'},
             {align:'center','text':'اسم الماركة',value:'name'},
-            {align:'center','text':'تعديل',value:'id'},
+            {align:'center','text':'تعديل',value:'id'}, 
           ],
           marks:[],
         };

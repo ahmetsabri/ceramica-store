@@ -59,9 +59,9 @@
       </v-container>
 
       <v-bottom-nav
+      app
      :active.sync="bottomNav"
      :value="true"
-
      color="indigo"
    >
    <marquee   direction="right"  behavior="alternate" scrollamount="1.5" class="qus">

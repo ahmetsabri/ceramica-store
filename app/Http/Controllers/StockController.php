@@ -47,16 +47,39 @@ class StockController extends Controller
     }
     public function read(Request $request)
     {
-      $mark = Mark::all();
-      $stock = Stock::all();
+      $mark = Mark::with('stock')->get();
+      $stock = Stock::with('marks')->get();
+
       return response()->json(['marks'=>$mark,'stock'=>$stock ]);
-    }
-    public function edit(Request $request)
-    {
 
     }
-    public function delete(Request $request)
+    public function edit_stock(Request $request)
     {
+      $id=$request->id;
+      $validatedata = $request->validate([
+        'mark_id'=>'required',
+        'filter_id'=>'required',
+        'color'=>'required',
+        'size'=>'required',
+        'price'=>'required',
+        'quantity'=>'required',
 
+      ]);
+      $edit_stock = Stock::findOrFail($id);
+      $edit_stock->mark_id = $request->id;
+      $edit_stock->filter_id = $request->filter_id;
+      $edit_stock->color = $request->color;
+      $edit_stock->size = $request->size;
+      $edit_stock->price = $request->price;
+      $edit_stock->quantity = $request->quantity;
+      $edit_stock->save();
+      return response()->json(['new_stock'=>$edit_stock],201);
+    }
+    public function delete_stock(Request $request)
+    {
+      $id = $request->id;
+      $delete_stock = Stock::findOrFail($id);
+      $delete_stock->delete();
+      return response()->json([''],203);
     }
 }

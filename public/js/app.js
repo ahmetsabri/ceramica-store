@@ -2159,6 +2159,44 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_1__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2355,9 +2393,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      showMark: null,
       showAddModal: false,
       showEditModal: false,
       allMarks: [],
@@ -2394,10 +2434,6 @@ __webpack_require__.r(__webpack_exports__);
         'text': 'الفرزة',
         'value': 'id',
         'align': 'center'
-      }, {
-        'text': 'الماركة',
-        'value': 'id',
-        'align': 'center'
       }],
       allFilters: [{
         'id': 1,
@@ -2411,8 +2447,17 @@ __webpack_require__.r(__webpack_exports__);
       }, {
         'id': 4,
         name: 'رابعة'
-      }]
+      }],
+      selectedMarkName: null
     };
+  },
+  watch: {
+    showMark: function showMark(n) {
+      var index = this.allMarks.findIndex(function (val) {
+        return val.id == n;
+      });
+      this.selectedMarkName = this.allMarks[index]['name'];
+    }
   },
   created: function created() {
     this.loadStock();
@@ -2423,6 +2468,7 @@ __webpack_require__.r(__webpack_exports__);
 
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/read', {}).then(function (response) {
         console.log(response.data.stock);
+        console.log(response.data.marks);
         _this.allMarks = response.data.marks;
         _this.stock = response.data.stock;
       })["catch"](function (errors) {
@@ -2451,15 +2497,23 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     deleteStock: function deleteStock(id) {
+      var _this3 = this;
+
       var sure = confirm('هل أنت متأكد ؟');
 
       if (sure) {
-        alert('I will delete');
-        alert(id);
         axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/delete', {
           id: id
         }).then(function (response) {
           console.log(response.data);
+
+          var index = _this3.stock.findIndex(function (val) {
+            return val.id == id;
+          });
+
+          _this3.stock.splice(index, 1);
+
+          _this3.done = true;
         })["catch"](function (errors) {
           alert('خطأ في الحذف');
           console.log(errors);
@@ -2482,9 +2536,10 @@ __webpack_require__.r(__webpack_exports__);
       this.showEditModal = true;
     },
     applyEditStock: function applyEditStock() {
-      var _this3 = this;
+      var _this4 = this;
 
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/edit', {
+        id: this.selectedId.id,
         mark_id: this.selectedMark,
         filter_id: this.selectedFilter,
         quantity: this.quantityInBox,
@@ -2492,7 +2547,16 @@ __webpack_require__.r(__webpack_exports__);
         size: this.sizeInMeter,
         price: this.priceForMeter
       }).then(function (response) {
-        _this3.done = true;
+        console.log(response.data);
+
+        var index = _this4.stock.findIndex(function (val) {
+          return val.id == _this4.selectedId.id;
+        });
+
+        vue__WEBPACK_IMPORTED_MODULE_1___default.a.set(_this4.stock, index, response.data.new_stock);
+        _this4.done = true;
+        _this4.showEditModal = false;
+        _this4.selectedId = null;
       })["catch"](function (errors) {
         alert('خطأ في التعديل');
         console.log(errors);
@@ -3234,7 +3298,12 @@ var render = function() {
       _c(
         "v-bottom-nav",
         {
-          attrs: { active: _vm.bottomNav, value: true, color: "indigo" },
+          attrs: {
+            app: "",
+            active: _vm.bottomNav,
+            value: true,
+            color: "indigo"
+          },
           on: {
             "update:active": function($event) {
               _vm.bottomNav = $event
@@ -3697,7 +3766,7 @@ var render = function() {
                         "solo-inverted": "",
                         items: _vm.allFilters,
                         "item-text": "name",
-                        "item-value": "id",
+                        "item-value": "name",
                         label: "الفرز"
                       },
                       model: {
@@ -3828,7 +3897,7 @@ var render = function() {
                         "solo-inverted": "",
                         items: _vm.allMarks,
                         "item-text": "name",
-                        "item-value": "id",
+                        "item-value": "name",
                         label: "الماركة"
                       },
                       model: {
@@ -3946,75 +4015,35 @@ var render = function() {
         1
       ),
       _vm._v(" "),
-      _c("v-data-table", {
-        staticClass: "elevation-1",
-        attrs: { headers: _vm.headers, items: _vm.stock, "hide-actions": "" },
-        scopedSlots: _vm._u([
-          {
-            key: "items",
-            fn: function(props) {
-              return [
-                _c(
-                  "td",
-                  { staticClass: "text-xs-center" },
-                  [
-                    _c(
-                      "v-btn",
-                      {
-                        attrs: { round: "", small: "", color: "error" },
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteStock(props.item.id)
-                          }
-                        }
-                      },
-                      [_vm._v(" حذف ")]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "v-btn",
-                      {
-                        attrs: { round: "", small: "", color: "info" },
-                        on: {
-                          click: function($event) {
-                            return _vm.editStock(props.item.id)
-                          }
-                        }
-                      },
-                      [_vm._v(" تعديل ")]
-                    )
-                  ],
-                  1
-                ),
-                _vm._v(" "),
-                _c("td", { staticClass: "text-xs-center" }, [
-                  _vm._v(_vm._s(props.item.price))
-                ]),
-                _vm._v(" "),
-                _c("td", { staticClass: "text-xs-center" }, [
-                  _vm._v(_vm._s(props.item.size))
-                ]),
-                _vm._v(" "),
-                _c("td", { staticClass: "text-xs-center" }, [
-                  _vm._v(_vm._s(props.item.quantity))
-                ]),
-                _vm._v(" "),
-                _c("td", { staticClass: "text-xs-center" }, [
-                  _vm._v(_vm._s(props.item.color))
-                ]),
-                _vm._v(" "),
-                _c("td", { staticClass: "text-xs-center" }, [
-                  _vm._v(_vm._s(props.item.filter_id))
-                ]),
-                _vm._v(" "),
-                _c("td", { staticClass: "text-xs-center" }, [
-                  _vm._v(_vm._s(props.item.mark_id))
-                ])
-              ]
+      _c(
+        "div",
+        { staticClass: "text-xs-center" },
+        [
+          _c("v-select", {
+            attrs: {
+              items: _vm.allMarks,
+              label: "اختر الماركة",
+              outline: "",
+              "item-text": "name",
+              "item-value": "id"
+            },
+            model: {
+              value: _vm.showMark,
+              callback: function($$v) {
+                _vm.showMark = $$v
+              },
+              expression: "showMark"
             }
-          }
-        ])
-      }),
+          }),
+          _vm._v(" "),
+          !!_vm.showMark
+            ? _c("h1", [
+                _vm._v("\n      " + _vm._s(_vm.selectedMarkName) + "\n    ")
+              ])
+            : _vm._e()
+        ],
+        1
+      ),
       _vm._v(" "),
       _c(
         "v-snackbar",

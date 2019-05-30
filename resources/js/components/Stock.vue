@@ -41,7 +41,7 @@
 
                       :items="allFilters"
                     item-text="name"
-                    item-value="id"
+                    item-value="name"
                     v-model="selectedFilter"
                     label="الفرز"
                   ></v-select>
@@ -104,7 +104,7 @@
                     solo-inverted
                     :items="allMarks"
                     item-text="name"
-                    item-value="id"
+                    item-value="name"
                     v-model="selectedMark"
                     label="الماركة"
                   >
@@ -160,9 +160,46 @@
           </div>
         </v-card>
       </v-dialog>
-      <v-data-table
+      <div class="text-xs-center">
+      <v-select
+        :items="allMarks"
+        v-model="showMark"
+        label="اختر الماركة"
+        outline
+        item-text="name"
+        item-value="id"
+      ></v-select>
+      <h1 v-if="!!showMark">
+        {{selectedMarkName}}
+      </h1>
+  </div>
+
+      <!-- <template v-for="mark in allMarks">
+          <h1 class="text-xs-right">{{mark.name}}</h1>
+          <v-data-table
+            :headers="headers"
+            :items="mark.stock"
+            hide-actions
+            class="elevation-1"
+          >
+          <template v-slot:items="props">
+
+            <td class="text-xs-center">
+              <v-btn round small color="error" @click="deleteStock(props.item.id)"> حذف </v-btn>
+              <v-btn round small color="info" @click="editStock(props.item.id)"> تعديل </v-btn>
+            </td>
+            <td class="text-xs-center">{{ props.item.price }}</td>
+            <td class="text-xs-center">{{ props.item.size }}</td>
+            <td class="text-xs-center">{{ props.item.quantity }}</td>
+            <td class="text-xs-center">{{ props.item.color }}</td>
+            <td class="text-xs-center">{{ props.item.filter_id }}</td>
+          </template>
+          </v-data-table>
+
+      </template> -->
+      <!-- <v-data-table
         :headers="headers"
-        :items="stock"
+        :items="allMarks"
         hide-actions
         class="elevation-1"
       >
@@ -172,15 +209,14 @@
           <v-btn round small color="error" @click="deleteStock(props.item.id)"> حذف </v-btn>
           <v-btn round small color="info" @click="editStock(props.item.id)"> تعديل </v-btn>
         </td>
-
-        <td class="text-xs-center">{{ props.item.price }}</td>
+        <td class="text-xs-center">{{ props.item.name }}</td>
         <td class="text-xs-center">{{ props.item.size }}</td>
         <td class="text-xs-center">{{ props.item.quantity }}</td>
         <td class="text-xs-center">{{ props.item.color }}</td>
         <td class="text-xs-center">{{ props.item.filter_id }}</td>
         <td class="text-xs-center">{{ props.item.mark_id }}</td>
       </template>
-      </v-data-table>
+      </v-data-table> -->
       <v-snackbar
         v-model="done"
         bottom
@@ -195,9 +231,11 @@
 
 <script>
 import axios from 'axios';
+import Vue from 'vue';
 export default {
   data(){
     return {
+      showMark:null,
       showAddModal:false,
       showEditModal:false,
       allMarks:[],
@@ -217,7 +255,6 @@ export default {
         {'text':'الكمية','value':'id','align':'center'},
         {'text':'اللون','value':'id','align':'center'},
         {'text':'الفرزة','value':'id','align':'center'},
-        {'text':'الماركة','value':'id','align':'center'},
       ],
       allFilters:[
         {'id':1,name:'أولى'},
@@ -225,9 +262,17 @@ export default {
         {'id':3,name:'تالتة'},
         {'id':4,name:'رابعة'},
       ],
+      selectedMarkName:null,
       };
   },
-
+  watch:{
+    showMark(n){
+      let index = this.allMarks.findIndex((val)=>{
+          return val.id == n;
+      });
+      this.selectedMarkName = this.allMarks[index]['name'];
+    }
+  },
   created(){
       this.loadStock()
   },
@@ -237,6 +282,7 @@ export default {
       axios.post('/api/stock/read',{})
       .then((response)=>{
         console.log(response.data.stock);
+        console.log(response.data.marks);
         this.allMarks = response.data.marks ;
         this.stock = response.data.stock;
 
@@ -272,13 +318,16 @@ export default {
       let sure = confirm ('هل أنت متأكد ؟');
 
       if (sure) {
-          alert('I will delete');
-          alert(id);
           axios.post('/api/stock/delete',{
             id,
           })
           .then((response)=>{
             console.log(response.data);
+            let index = this.stock.findIndex((val)=>{
+                return val.id == id;
+            });
+            this.stock.splice(index,1);
+            this.done = true;
           })
           .catch((errors)=>{
             alert('خطأ في الحذف');
@@ -294,7 +343,7 @@ export default {
           return val.id == id;
       });
 
-       this.selectedId = this.stock[index];
+      this.selectedId = this.stock[index];
       this.selectedMark = this.selectedId.mark_id;
       this.selectedFilter =   this.selectedId.filter_id;
       this.quantityInBox = this.selectedId.quantity;
@@ -306,6 +355,7 @@ export default {
 
     applyEditStock(){
         axios.post('/api/stock/edit',{
+          id:this.selectedId.id,
           mark_id:this.selectedMark,
           filter_id:this.selectedFilter,
           quantity:this.quantityInBox,
@@ -314,7 +364,14 @@ export default {
           price:this.priceForMeter,
         })
         .then((response)=>{
-          this.done = true;
+          console.log(response.data);
+          let index = this.stock.findIndex((val)=>{
+              return val.id == this.selectedId.id;
+          });
+            Vue.set(this.stock,index,response.data.new_stock)
+            this.done = true;
+            this.showEditModal = false;
+            this.selectedId = null;
         })
         .catch((errors)=>{
           alert('خطأ في التعديل')

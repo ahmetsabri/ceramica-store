@@ -10,12 +10,8 @@ class Stock extends Model
 
     public function marks()
     {
-      return $this->hasMany('App\Mark');
+      return $this->belongsTo('App\Mark');
     }
 
-    public function filters()
-    {
-      return $this->hasMany('App\Filter');
-    }
 
 }

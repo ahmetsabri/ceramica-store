@@ -11,6 +11,6 @@ class Mark extends Model
 
     public function stock()
     {
-        return $this->belongsTo('App\Stock');
+        return $this->hasMany('App\Stock');
     }
 }

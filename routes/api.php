@@ -17,8 +17,8 @@ Route::group(['prefix'=>'stock'],function(){
 Route::post('/create','StockController@store')->name('stock.create');
 Route::post('/read','StockController@read')->name('stock.read');
 
-Route::post('/delete','StockController@delete_mark')->name('stock.delete');
+Route::post('/delete','StockController@delete_stock')->name('stock.delete');
 
-Route::post('/edit','StockController@edit_mark')->name('stock.edit');
+Route::post('/edit','StockController@edit_stock')->name('stock.edit');
 
 });

@@ -21,4 +21,5 @@ Route::post('/delete','StockController@delete_stock')->name('stock.delete');
 
 Route::post('/edit','StockController@edit_stock')->name('stock.edit');
 
+Route::post('/get-stock','StockController@get_stock')->name('getstock');
 });

@@ -1879,6 +1879,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     console.log('Component mounted.');
@@ -2366,32 +2370,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2457,6 +2435,26 @@ __webpack_require__.r(__webpack_exports__);
         return val.id == n;
       });
       this.selectedMarkName = this.allMarks[index]['name'];
+      this.selectedMark = this.allMarks[index]['id'];
+      this.loadMarkStock(n);
+    },
+    showEditModal: function showEditModal(n) {
+      if (n == false) {
+        this.selctedColor = '';
+        this.quantityInBox = '';
+        this.sizeInMeter = '';
+        this.priceForMeter = '';
+        this.selectedFilter = '';
+      }
+    },
+    showAddModal: function showAddModal(n) {
+      if (n == false) {
+        this.selctedColor = '';
+        this.quantityInBox = '';
+        this.sizeInMeter = '';
+        this.priceForMeter = '';
+        this.selectedFilter = '';
+      }
     }
   },
   created: function created() {
@@ -2470,7 +2468,20 @@ __webpack_require__.r(__webpack_exports__);
         console.log(response.data.stock);
         console.log(response.data.marks);
         _this.allMarks = response.data.marks;
-        _this.stock = response.data.stock;
+      })["catch"](function (errors) {
+        alert('error in reading');
+        console.log(errors);
+        console.log(errors.response);
+      });
+    },
+    loadMarkStock: function loadMarkStock(id) {
+      var _this2 = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/get-stock', {
+        id: id
+      }).then(function (response) {
+        console.log(response.data.stock);
+        _this2.stock = response.data.stock;
       })["catch"](function (errors) {
         alert('error in reading');
         console.log(errors);
@@ -2478,7 +2489,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     addStock: function addStock() {
-      var _this2 = this;
+      var _this3 = this;
 
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/create', {
         mark_id: this.selectedMark,
@@ -2489,15 +2500,15 @@ __webpack_require__.r(__webpack_exports__);
         price: this.priceForMeter
       }).then(function (response) {
         console.log(response.data);
-        _this2.showAddModal = false;
-        _this2.done = true;
+        _this3.showAddModal = false;
+        _this3.done = true;
       })["catch"](function (errors) {
         console.log(errors);
         console.log(errors.response);
       });
     },
     deleteStock: function deleteStock(id) {
-      var _this3 = this;
+      var _this4 = this;
 
       var sure = confirm('هل أنت متأكد ؟');
 
@@ -2507,13 +2518,13 @@ __webpack_require__.r(__webpack_exports__);
         }).then(function (response) {
           console.log(response.data);
 
-          var index = _this3.stock.findIndex(function (val) {
+          var index = _this4.stock.findIndex(function (val) {
             return val.id == id;
           });
 
-          _this3.stock.splice(index, 1);
+          _this4.stock.splice(index, 1);
 
-          _this3.done = true;
+          _this4.done = true;
         })["catch"](function (errors) {
           alert('خطأ في الحذف');
           console.log(errors);
@@ -2536,7 +2547,7 @@ __webpack_require__.r(__webpack_exports__);
       this.showEditModal = true;
     },
     applyEditStock: function applyEditStock() {
-      var _this4 = this;
+      var _this5 = this;
 
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/edit', {
         id: this.selectedId.id,
@@ -2549,14 +2560,14 @@ __webpack_require__.r(__webpack_exports__);
       }).then(function (response) {
         console.log(response.data);
 
-        var index = _this4.stock.findIndex(function (val) {
-          return val.id == _this4.selectedId.id;
+        var index = _this5.stock.findIndex(function (val) {
+          return val.id == _this5.selectedId.id;
         });
 
-        vue__WEBPACK_IMPORTED_MODULE_1___default.a.set(_this4.stock, index, response.data.new_stock);
-        _this4.done = true;
-        _this4.showEditModal = false;
-        _this4.selectedId = null;
+        vue__WEBPACK_IMPORTED_MODULE_1___default.a.set(_this5.stock, index, response.data.new_stock);
+        _this5.done = true;
+        _this5.showEditModal = false;
+        _this5.selectedId = null;
       })["catch"](function (errors) {
         alert('خطأ في التعديل');
         console.log(errors);
@@ -3219,7 +3230,7 @@ var render = function() {
                                 [
                                   _c("v-icon", [_vm._v("store")]),
                                   _vm._v(
-                                    "\n\n                 المخزن\n               "
+                                    "\n                 المخزن\n               "
                                   )
                                 ],
                                 1
@@ -3322,8 +3333,16 @@ var render = function() {
               }
             },
             [
-              _c("h1", { staticClass: "white--text" }, [
-                _vm._v("مرحبا بكم في معرض الرحمة")
+              _c("h1", {}, [
+                _c("bdi", [
+                  _c("span", { staticClass: "white--text" }, [
+                    _vm._v("\n      مرحباً بكم في معرض الرحمة للسيراميك\n    ")
+                  ]),
+                  _vm._v(" "),
+                  _c("span", { staticClass: "yellow--text" }, [
+                    _vm._v("01017260199")
+                  ])
+                ])
               ])
             ]
           )
@@ -3897,7 +3916,7 @@ var render = function() {
                         "solo-inverted": "",
                         items: _vm.allMarks,
                         "item-text": "name",
-                        "item-value": "name",
+                        "item-value": "id",
                         label: "الماركة"
                       },
                       model: {
@@ -3914,7 +3933,7 @@ var render = function() {
                         "solo-inverted": "",
                         items: _vm.allFilters,
                         "item-text": "name",
-                        "item-value": "id",
+                        "item-value": "name",
                         label: "الفرز"
                       },
                       model: {
@@ -4044,6 +4063,72 @@ var render = function() {
         ],
         1
       ),
+      _vm._v(" "),
+      _c("v-data-table", {
+        staticClass: "elevation-1",
+        attrs: { headers: _vm.headers, items: _vm.stock, "hide-actions": "" },
+        scopedSlots: _vm._u([
+          {
+            key: "items",
+            fn: function(props) {
+              return [
+                _c(
+                  "td",
+                  { staticClass: "text-xs-center" },
+                  [
+                    _c(
+                      "v-btn",
+                      {
+                        attrs: { round: "", small: "", color: "error" },
+                        on: {
+                          click: function($event) {
+                            return _vm.deleteStock(props.item.id)
+                          }
+                        }
+                      },
+                      [_vm._v(" حذف ")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      {
+                        attrs: { round: "", small: "", color: "info" },
+                        on: {
+                          click: function($event) {
+                            return _vm.editStock(props.item.id)
+                          }
+                        }
+                      },
+                      [_vm._v(" تعديل ")]
+                    )
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-xs-center" }, [
+                  _vm._v(_vm._s(props.item.price))
+                ]),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-xs-center" }, [
+                  _vm._v(_vm._s(props.item.size))
+                ]),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-xs-center" }, [
+                  _vm._v(_vm._s(props.item.quantity))
+                ]),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-xs-center" }, [
+                  _vm._v(_vm._s(props.item.color))
+                ]),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-xs-center" }, [
+                  _vm._v(_vm._s(props.item.filter_id))
+                ])
+              ]
+            }
+          }
+        ])
+      }),
       _vm._v(" "),
       _c(
         "v-snackbar",

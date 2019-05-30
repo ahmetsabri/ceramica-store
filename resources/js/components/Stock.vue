@@ -104,7 +104,7 @@
                     solo-inverted
                     :items="allMarks"
                     item-text="name"
-                    item-value="name"
+                    item-value="id"
                     v-model="selectedMark"
                     label="الماركة"
                   >
@@ -115,7 +115,7 @@
 
                       :items="allFilters"
                     item-text="name"
-                    item-value="id"
+                    item-value="name"
                     v-model="selectedFilter"
                     label="الفرز"
                   ></v-select>
@@ -173,50 +173,24 @@
         {{selectedMarkName}}
       </h1>
   </div>
-
-      <!-- <template v-for="mark in allMarks">
-          <h1 class="text-xs-right">{{mark.name}}</h1>
-          <v-data-table
-            :headers="headers"
-            :items="mark.stock"
-            hide-actions
-            class="elevation-1"
-          >
-          <template v-slot:items="props">
-
-            <td class="text-xs-center">
-              <v-btn round small color="error" @click="deleteStock(props.item.id)"> حذف </v-btn>
-              <v-btn round small color="info" @click="editStock(props.item.id)"> تعديل </v-btn>
-            </td>
-            <td class="text-xs-center">{{ props.item.price }}</td>
-            <td class="text-xs-center">{{ props.item.size }}</td>
-            <td class="text-xs-center">{{ props.item.quantity }}</td>
-            <td class="text-xs-center">{{ props.item.color }}</td>
-            <td class="text-xs-center">{{ props.item.filter_id }}</td>
-          </template>
-          </v-data-table>
-
-      </template> -->
-      <!-- <v-data-table
+    <v-data-table
         :headers="headers"
-        :items="allMarks"
+        :items="stock"
         hide-actions
-        class="elevation-1"
-      >
-      <template v-slot:items="props">
+        class="elevation-1">
 
+      <template v-slot:items="props">
         <td class="text-xs-center">
           <v-btn round small color="error" @click="deleteStock(props.item.id)"> حذف </v-btn>
           <v-btn round small color="info" @click="editStock(props.item.id)"> تعديل </v-btn>
         </td>
-        <td class="text-xs-center">{{ props.item.name }}</td>
+        <td class="text-xs-center">{{ props.item.price }}</td>
         <td class="text-xs-center">{{ props.item.size }}</td>
         <td class="text-xs-center">{{ props.item.quantity }}</td>
         <td class="text-xs-center">{{ props.item.color }}</td>
         <td class="text-xs-center">{{ props.item.filter_id }}</td>
-        <td class="text-xs-center">{{ props.item.mark_id }}</td>
       </template>
-      </v-data-table> -->
+      </v-data-table>
       <v-snackbar
         v-model="done"
         bottom
@@ -271,21 +245,54 @@ export default {
           return val.id == n;
       });
       this.selectedMarkName = this.allMarks[index]['name'];
+      this.selectedMark = this.allMarks[index]['id'];
+      this.loadMarkStock(n);
+    },
+    showEditModal(n){
+      if (n == false) {
+              this.selctedColor = '';
+              this.quantityInBox='';
+              this.sizeInMeter='';
+              this.priceForMeter='';
+              this.selectedFilter='';
+      }
+    },
+    showAddModal(n){
+      if (n == false) {
+              this.selctedColor = '';
+              this.quantityInBox='';
+              this.sizeInMeter='';
+              this.priceForMeter='';
+              this.selectedFilter='';
+      }
     }
   },
   created(){
-      this.loadStock()
+    this.loadStock();
   },
-
   methods:{
     loadStock(){
-      axios.post('/api/stock/read',{})
+      axios.post('/api/stock/read',{
+      })
       .then((response)=>{
         console.log(response.data.stock);
         console.log(response.data.marks);
         this.allMarks = response.data.marks ;
-        this.stock = response.data.stock;
 
+       })
+      .catch((errors)=>{
+        alert('error in reading');
+        console.log(errors);
+        console.log(errors.response);
+      })
+    },
+    loadMarkStock(id){
+      axios.post('/api/stock/get-stock',{
+        id,
+      })
+      .then((response)=>{
+          console.log(response.data.stock);
+          this.stock = response.data.stock;
        })
       .catch((errors)=>{
         alert('error in reading');

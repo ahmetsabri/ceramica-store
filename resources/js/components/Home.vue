@@ -20,7 +20,6 @@
                 <v-list-tile router to="/stock">
                   <h3>
                     <v-icon>store</v-icon>
-
                     المخزن
                   </h3>
                 </v-list-tile>
@@ -46,8 +45,6 @@
                     العملاء
                   </h3>
                 </v-list-tile>
-
-
               </v-list>
           </v-navigation-drawer>
         </v-flex>
@@ -65,7 +62,14 @@
      color="indigo"
    >
    <marquee   direction="right"  behavior="alternate" scrollamount="1.5" class="qus">
-     <h1 class="white--text">مرحبا بكم في معرض الرحمة</h1>
+     <h1 class="">
+       <bdi>
+         <span class="white--text">
+         مرحباً بكم في معرض الرحمة للسيراميك
+       </span>
+         <span class="yellow--text">01017260199</span>
+       </bdi>
+     </h1>
    </marquee>
    </v-bottom-nav>
 

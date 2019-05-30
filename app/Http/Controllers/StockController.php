@@ -82,4 +82,13 @@ class StockController extends Controller
       $delete_stock->delete();
       return response()->json([''],203);
     }
+
+    public function get_stock(Request $request)
+    {
+      $id = $request->id;
+      
+      $get_stock = Mark::findOrFail($id)->stock;
+
+      return response()->json(['stock'=>$get_stock],201);
+    }
 }

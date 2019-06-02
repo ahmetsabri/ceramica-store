@@ -13,9 +13,10 @@ class CreateStocksTable extends Migration
             $table->integer('mark_id');
             $table->string('filter_id');
             $table->string('color');
-            $table->decimal('quantity');
+            $table->integer('quantity');
             $table->decimal('size');
             $table->decimal('price');
+            $table->string('dimension')->nullable();
 
             $table->timestamps();
         });

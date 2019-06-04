@@ -1763,6 +1763,8 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -1771,7 +1773,106 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ __webpack_exports__["default"] = ({});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      selectedItems: [],
+      selectedItemsModel: [],
+      selectedMarks: [],
+      allMarks: null,
+      nameRules: [function (v) {
+        return !!v || 'يجب ملء هذه الخانة';
+      }]
+    };
+  },
+  computed: {
+    allFilled: function allFilled() {
+      if (this.selectedItemsModel.length > 0) {
+        if (this.selectedItemsModel.length == this.selectedItems.length) {
+          var isFilled = this.selectedItemsModel.map(function (val) {
+            return val > 0;
+          });
+          return isFilled.indexOf(false) == -1;
+        }
+      } else {
+        return false;
+      }
+    }
+  },
+  watch: {
+    selectedItems: function selectedItems(n, o) {
+      console.log(this.selectedItemsModel);
+
+      if (n.length < o.length) {
+        console.log('old', o);
+        console.log('new', n);
+
+        for (var i = 0; i < o.length; i++) {
+          if (n.indexOf(o[i]) == -1) {
+            this.selectedItemsModel.splice(i, 1);
+          }
+        }
+      }
+    }
+  },
+  created: function created() {
+    this.loadStock();
+  },
+  methods: {
+    loadStock: function loadStock() {
+      var _this = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/read', {}).then(function (response) {
+        console.log(response.data.marks);
+        _this.allMarks = response.data.marks;
+      })["catch"](function (errors) {
+        alert('error in loading marks');
+        console.log(errors);
+        console.log(errors.response);
+      });
+    },
+    createNewBill: function createNewBill() {
+      alert('ok man');
+    }
+  }
+});
 
 /***/ }),
 
@@ -3114,9 +3215,129 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("v-content", [
-    _c("h1", { staticClass: "text-xs-center" }, [_vm._v("\n    Bills\n  ")])
-  ])
+  return _c(
+    "v-content",
+    [
+      _c("h1", { staticClass: "text-xs-center" }, [
+        _vm._v("\n      بسم الله الرحمن الرحيم\n    ")
+      ]),
+      _vm._v(" "),
+      _c("h2", [_vm._v(_vm._s(_vm.allFilled))]),
+      _vm._v(" "),
+      _vm._l(_vm.allMarks, function(mark) {
+        return [
+          _c(
+            "div",
+            { attrs: { dir: "rtl" } },
+            [
+              _c("h1", { staticClass: "indigo--text" }, [
+                _vm._v("\n         " + _vm._s(mark.name) + "\n\n")
+              ]),
+              _vm._v(" "),
+              _vm._l(mark.stock, function(item, index) {
+                return [
+                  _c(
+                    "v-flex",
+                    { attrs: { xs3: "" } },
+                    [
+                      _c("v-divider", { staticClass: "ma-3" }),
+                      _vm._v(" "),
+                      _c("v-checkbox", {
+                        attrs: {
+                          color: "indigo",
+                          label: "John",
+                          value: item.id
+                        },
+                        scopedSlots: _vm._u(
+                          [
+                            {
+                              key: "label",
+                              fn: function() {
+                                return [
+                                  _c("bdi", { staticClass: "black--text" }, [
+                                    _vm._v(
+                                      "\n                        فرزة " +
+                                        _vm._s(item.filter_id) +
+                                        " - " +
+                                        _vm._s(item.color) +
+                                        " - مقاس " +
+                                        _vm._s(item.dimension) +
+                                        "\n                    "
+                                    )
+                                  ])
+                                ]
+                              },
+                              proxy: true
+                            }
+                          ],
+                          null,
+                          true
+                        ),
+                        model: {
+                          value: _vm.selectedItems,
+                          callback: function($$v) {
+                            _vm.selectedItems = $$v
+                          },
+                          expression: "selectedItems"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _vm.selectedItems.indexOf(item.id) > -1
+                        ? _c("v-text-field", {
+                            attrs: {
+                              rules: _vm.nameRules,
+                              width: "120",
+                              label: "الكمية بالكرتونة",
+                              "solo-inverted": ""
+                            },
+                            model: {
+                              value:
+                                _vm.selectedItemsModel[
+                                  _vm.selectedItems.indexOf(item.id)
+                                ],
+                              callback: function($$v) {
+                                _vm.$set(
+                                  _vm.selectedItemsModel,
+                                  _vm.selectedItems.indexOf(item.id),
+                                  $$v
+                                )
+                              },
+                              expression:
+                                "selectedItemsModel[selectedItems.indexOf(item.id)]"
+                            }
+                          })
+                        : _vm._e()
+                    ],
+                    1
+                  )
+                ]
+              }),
+              _vm._v(" "),
+              _c("v-divider")
+            ],
+            2
+          )
+        ]
+      }),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "text-xs-center" },
+        [
+          _c(
+            "v-btn",
+            {
+              staticClass: "indigo white--text",
+              attrs: { disabled: !_vm.allFilled }
+            },
+            [_vm._v(" انشاء")]
+          )
+        ],
+        1
+      )
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true

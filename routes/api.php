@@ -23,3 +23,13 @@ Route::post('/edit','StockController@edit_stock')->name('stock.edit');
 
 Route::post('/get-stock','StockController@get_stock')->name('getstock');
 });
+Route::group(['prefix'=>'bill'],function(){
+
+
+Route::post('/create','BillController@store')->name('bill.store');
+Route::post('/delete','BillController@delete_bill')->name('bill.delete');
+Route::get('/edit','BillController@edit_bill')->name('bill.edit');
+//fetch customer_id
+Route::post('/search-customer','BillController@search_customer')->name('customer.read');
+
+});

@@ -12,6 +12,10 @@ class Stock extends Model
     {
       return $this->belongsTo('App\Mark');
     }
+    public function bill_detail()
+    {
+      return $this->belongsTo('App\BillDeatils');
+    }
 
 
 }

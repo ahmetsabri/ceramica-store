@@ -8,11 +8,11 @@ class Customer extends Model
 {
   protected $guarded = [];
 
-  public function bill()
+  public function bills()
   {
-    return $this->hasOne('App\Bill');
+    return $this->hasMany('App\Bill');
   }
 
 
-  
+
 }

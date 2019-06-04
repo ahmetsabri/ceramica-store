@@ -1765,6 +1765,147 @@ module.exports = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -1812,17 +1953,71 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
-    return {
+    var _ref;
+
+    return _ref = {
+      search: "",
+      billsHeaders: [{
+        'text': 'تفاصيل الفاتورة',
+        'align': 'center',
+        'value': 'id'
+      }, {
+        'text': 'اخر تعديل',
+        'align': 'center',
+        'value': 'id'
+      }, {
+        'text': 'تاريخ الفاتورة',
+        'align': 'center',
+        'value': 'id'
+      }, {
+        'text': 'باقي',
+        'align': 'center',
+        'value': 'id'
+      }, {
+        'text': 'مدفوع',
+        'align': 'center',
+        'value': 'id'
+      }, {
+        'text': 'الاجمالي',
+        'align': 'center',
+        'value': 'id'
+      }],
+      headers: [{
+        'text': 'العنوان',
+        'align': 'center',
+        'value': 'id'
+      }, {
+        'text': 'رقم الهاتف',
+        'align': 'center',
+        'value': 'id'
+      }, {
+        'text': 'الاسم',
+        'align': 'center',
+        'value': 'id'
+      }],
+      newCustomer: false,
+      e1: 0,
+      selectedCustomer: null,
+      selectedCustomerBills: null,
+      name: '',
+      phone: '',
+      address: '',
       selectedItems: [],
       selectedItemsModel: [],
       selectedMarks: [],
+      searchResults: [],
+      sumTotal: 0,
       allMarks: null,
-      nameRules: [function (v) {
-        return !!v || 'يجب ملء هذه الخانة';
-      }]
-    };
+      total: 0,
+      paid: ''
+    }, _defineProperty(_ref, "total", 0), _defineProperty(_ref, "remain", 0), _defineProperty(_ref, "totalSum", []), _defineProperty(_ref, "nameRules", [function (v) {
+      return !!v || 'يجب ملء هذه الخانة';
+    }]), _ref;
   },
   computed: {
+    customerDataOk: function customerDataOk() {
+      return this.name.length > 0 && this.address.length > 0 && this.phone.length > 0;
+    },
     allFilled: function allFilled() {
       if (this.selectedItemsModel.length > 0) {
         if (this.selectedItemsModel.length == this.selectedItems.length) {
@@ -1837,6 +2032,10 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   watch: {
+    paid: function paid(n) {
+      this.remain = this.total - n;
+      console.log(n);
+    },
     selectedItems: function selectedItems(n, o) {
       console.log(this.selectedItemsModel);
 
@@ -1847,8 +2046,26 @@ __webpack_require__.r(__webpack_exports__);
         for (var i = 0; i < o.length; i++) {
           if (n.indexOf(o[i]) == -1) {
             this.selectedItemsModel.splice(i, 1);
+            this.totalSum.splice(i, 1);
           }
         }
+
+        if (this.totalSum.length > 0) {
+          var sum = this.totalSum.reduce(function (a, b) {
+            return a + b;
+          });
+          this.total = sum;
+          this.remain = this.total - this.paid;
+        } else {
+          this.total = 0;
+          this.paid = 0;
+          this.remain = 0;
+        }
+      }
+    },
+    search: function search(n, o) {
+      if (n.length > 0) {
+        this.searchCustomer();
       }
     }
   },
@@ -1856,6 +2073,29 @@ __webpack_require__.r(__webpack_exports__);
     this.loadStock();
   },
   methods: {
+    showBill: function showBill(id) {
+      alert(id);
+    },
+    showCustomer: function showCustomer(id) {
+      var index = this.searchResults.findIndex(function (val) {
+        return val.id == id;
+      });
+      this.selectedCustomer = [this.searchResults[index]];
+      this.selectedCustomerBills = this.selectedCustomer[0]['bills'];
+      console.log(this.selectedCustomerBills);
+    },
+    calculateTotal: function calculateTotal(id, price, size, quantity) {
+      var index = this.selectedItems.indexOf(id);
+      this.totalSum[index] = price * size * quantity;
+      var sum = this.totalSum.reduce(function (a, b) {
+        return a + b;
+      });
+      console.log(this.selectedItems);
+      console.log(this.totalSum);
+      console.log(sum);
+      this.total = sum;
+      this.remain = this.total - this.paid;
+    },
     loadStock: function loadStock() {
       var _this = this;
 
@@ -1869,7 +2109,36 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     createNewBill: function createNewBill() {
-      alert('ok man');
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/create', {
+        name: this.name,
+        address: this.address,
+        phone: this.phone,
+        remain: this.remain,
+        total: this.total,
+        paid: this.paid,
+        stock: this.selectedItems,
+        quantity: this.selectedItemsModel
+      }).then(function (response) {
+        console.log(response.data);
+      })["catch"](function (errors) {
+        alert('error in create bill');
+        console.log(errors);
+        console.log(errors.response.data);
+      });
+    },
+    searchCustomer: function searchCustomer() {
+      var _this2 = this;
+
+      var data = {
+        search: this.search
+      };
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/search-customer', data).then(function (response) {
+        console.log(response.data.customer);
+        _this2.searchResults = response.data.customer;
+      })["catch"](function (errors) {
+        console.log(error);
+        console.log(error.response);
+      });
     }
   }
 });
@@ -3219,106 +3488,8 @@ var render = function() {
     "v-content",
     [
       _c("h1", { staticClass: "text-xs-center" }, [
-        _vm._v("\n      بسم الله الرحمن الرحيم\n    ")
+        _vm._v("\n    بسم الله الرحمن الرحيم\n  ")
       ]),
-      _vm._v(" "),
-      _c("h2", [_vm._v(_vm._s(_vm.allFilled))]),
-      _vm._v(" "),
-      _vm._l(_vm.allMarks, function(mark) {
-        return [
-          _c(
-            "div",
-            { attrs: { dir: "rtl" } },
-            [
-              _c("h1", { staticClass: "indigo--text" }, [
-                _vm._v("\n         " + _vm._s(mark.name) + "\n\n")
-              ]),
-              _vm._v(" "),
-              _vm._l(mark.stock, function(item, index) {
-                return [
-                  _c(
-                    "v-flex",
-                    { attrs: { xs3: "" } },
-                    [
-                      _c("v-divider", { staticClass: "ma-3" }),
-                      _vm._v(" "),
-                      _c("v-checkbox", {
-                        attrs: {
-                          color: "indigo",
-                          label: "John",
-                          value: item.id
-                        },
-                        scopedSlots: _vm._u(
-                          [
-                            {
-                              key: "label",
-                              fn: function() {
-                                return [
-                                  _c("bdi", { staticClass: "black--text" }, [
-                                    _vm._v(
-                                      "\n                        فرزة " +
-                                        _vm._s(item.filter_id) +
-                                        " - " +
-                                        _vm._s(item.color) +
-                                        " - مقاس " +
-                                        _vm._s(item.dimension) +
-                                        "\n                    "
-                                    )
-                                  ])
-                                ]
-                              },
-                              proxy: true
-                            }
-                          ],
-                          null,
-                          true
-                        ),
-                        model: {
-                          value: _vm.selectedItems,
-                          callback: function($$v) {
-                            _vm.selectedItems = $$v
-                          },
-                          expression: "selectedItems"
-                        }
-                      }),
-                      _vm._v(" "),
-                      _vm.selectedItems.indexOf(item.id) > -1
-                        ? _c("v-text-field", {
-                            attrs: {
-                              rules: _vm.nameRules,
-                              width: "120",
-                              label: "الكمية بالكرتونة",
-                              "solo-inverted": ""
-                            },
-                            model: {
-                              value:
-                                _vm.selectedItemsModel[
-                                  _vm.selectedItems.indexOf(item.id)
-                                ],
-                              callback: function($$v) {
-                                _vm.$set(
-                                  _vm.selectedItemsModel,
-                                  _vm.selectedItems.indexOf(item.id),
-                                  $$v
-                                )
-                              },
-                              expression:
-                                "selectedItemsModel[selectedItems.indexOf(item.id)]"
-                            }
-                          })
-                        : _vm._e()
-                    ],
-                    1
-                  )
-                ]
-              }),
-              _vm._v(" "),
-              _c("v-divider")
-            ],
-            2
-          )
-        ]
-      }),
       _vm._v(" "),
       _c(
         "div",
@@ -3328,15 +3499,549 @@ var render = function() {
             "v-btn",
             {
               staticClass: "indigo white--text",
-              attrs: { disabled: !_vm.allFilled }
+              attrs: { large: "", round: "" },
+              on: {
+                click: function($event) {
+                  _vm.newCustomer = false
+                }
+              }
             },
-            [_vm._v(" انشاء")]
-          )
+            [_vm._v("عميل حالي")]
+          ),
+          _vm._v(" "),
+          _c(
+            "v-btn",
+            {
+              staticClass: "indigo white--text",
+              attrs: { large: "", round: "" },
+              on: {
+                click: function($event) {
+                  _vm.newCustomer = true
+                }
+              }
+            },
+            [_vm._v("عميل جديد")]
+          ),
+          _vm._v(" "),
+          !_vm.newCustomer
+            ? _c("v-text-field", {
+                attrs: { placeholder: "بحث عن عميل", "solo-inverted": "" },
+                model: {
+                  value: _vm.search,
+                  callback: function($$v) {
+                    _vm.search = $$v
+                  },
+                  expression: "search"
+                }
+              })
+            : _vm._e(),
+          _vm._v(" "),
+          _c(
+            "v-list",
+            { attrs: { dark: "" } },
+            [
+              _vm._l(_vm.searchResults, function(result) {
+                return [
+                  _c(
+                    "v-list-tile",
+                    {
+                      on: {
+                        click: function($event) {
+                          return _vm.showCustomer(result.id)
+                        }
+                      }
+                    },
+                    [
+                      _vm._v(
+                        "\n            " + _vm._s(result.name) + "\n        "
+                      )
+                    ]
+                  )
+                ]
+              })
+            ],
+            2
+          ),
+          _vm._v(" "),
+          !!_vm.selectedCustomer
+            ? _c("v-data-table", {
+                attrs: {
+                  headers: _vm.headers,
+                  items: _vm.selectedCustomer,
+                  "hide-actions": ""
+                },
+                scopedSlots: _vm._u(
+                  [
+                    {
+                      key: "items",
+                      fn: function(props) {
+                        return [
+                          _c("td", { staticClass: "text-xs-center" }, [
+                            _vm._v(
+                              "\n                  " +
+                                _vm._s(props.item.address) +
+                                "\n                "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", { staticClass: "text-xs-center" }, [
+                            _vm._v(
+                              "\n                  " +
+                                _vm._s(props.item.phone) +
+                                "\n\n                "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", { staticClass: "text-xs-center" }, [
+                            _vm._v(
+                              "\n                  " +
+                                _vm._s(props.item.name) +
+                                "\n                "
+                            )
+                          ])
+                        ]
+                      }
+                    }
+                  ],
+                  null,
+                  false,
+                  3014680556
+                )
+              })
+            : _vm._e(),
+          _vm._v(" "),
+          !!_vm.selectedCustomerBills
+            ? _c("h1", { staticClass: "text-xs-center ma-3" }, [
+                _vm._v("الفواتير")
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          !!_vm.selectedCustomerBills
+            ? _c("v-data-table", {
+                staticClass: "elevation-1",
+                attrs: {
+                  headers: _vm.billsHeaders,
+                  items: _vm.selectedCustomerBills,
+                  "hide-actions": ""
+                },
+                scopedSlots: _vm._u(
+                  [
+                    {
+                      key: "items",
+                      fn: function(props) {
+                        return [
+                          _c(
+                            "td",
+                            { staticClass: "text-xs-center" },
+                            [
+                              _c(
+                                "v-btn",
+                                {
+                                  staticClass: "indigo white--text",
+                                  attrs: { round: "" },
+                                  on: {
+                                    click: function() {
+                                      return _vm.showBill(props.item.id)
+                                    }
+                                  }
+                                },
+                                [_vm._v(" عرض التفاصيل")]
+                              )
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c("td", { staticClass: "text-xs-center" }, [
+                            _vm._v(
+                              "\n            " +
+                                _vm._s(props.item.updated_at) +
+                                "\n          "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", { staticClass: "text-xs-center" }, [
+                            _vm._v(
+                              "\n              " +
+                                _vm._s(props.item.created_at) +
+                                "\n          "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", { staticClass: "text-xs-center" }, [
+                            _vm._v(
+                              "\n            " +
+                                _vm._s(props.item.remain) +
+                                "\n          "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", { staticClass: "text-xs-center" }, [
+                            _vm._v(
+                              "\n            " +
+                                _vm._s(props.item.paid) +
+                                "\n          "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", { staticClass: "text-xs-center" }, [
+                            _vm._v(
+                              "\n            " +
+                                _vm._s(props.item.total) +
+                                "\n          "
+                            )
+                          ])
+                        ]
+                      }
+                    }
+                  ],
+                  null,
+                  false,
+                  1827667573
+                )
+              })
+            : _vm._e()
         ],
         1
-      )
+      ),
+      _vm._v(" "),
+      _vm.newCustomer
+        ? _c(
+            "v-stepper",
+            {
+              model: {
+                value: _vm.e1,
+                callback: function($$v) {
+                  _vm.e1 = $$v
+                },
+                expression: "e1"
+              }
+            },
+            [
+              _c(
+                "v-stepper-header",
+                [
+                  _c(
+                    "v-stepper-step",
+                    {
+                      staticClass: "indigo--text",
+                      attrs: { complete: _vm.e1 > 1, step: "1" }
+                    },
+                    [_vm._v("بيانات العميل")]
+                  ),
+                  _vm._v(" "),
+                  _c("v-divider"),
+                  _vm._v(" "),
+                  _c(
+                    "v-stepper-step",
+                    {
+                      staticClass: "indigo--text",
+                      attrs: { complete: _vm.e1 > 2, step: "2" }
+                    },
+                    [_vm._v("تفاصيل الفاتورة")]
+                  ),
+                  _vm._v(" "),
+                  _c("v-divider")
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-stepper-items",
+                [
+                  _c(
+                    "v-stepper-content",
+                    { attrs: { step: "1" } },
+                    [
+                      _c("v-text-field", {
+                        attrs: { label: "اسم العميل", outline: "" },
+                        model: {
+                          value: _vm.name,
+                          callback: function($$v) {
+                            _vm.name = $$v
+                          },
+                          expression: "name"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("v-text-field", {
+                        attrs: { label: "العنوان", outline: "" },
+                        model: {
+                          value: _vm.address,
+                          callback: function($$v) {
+                            _vm.address = $$v
+                          },
+                          expression: "address"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("v-text-field", {
+                        attrs: { label: "رقم التلفون", outline: "" },
+                        model: {
+                          value: _vm.phone,
+                          callback: function($$v) {
+                            _vm.phone = $$v
+                          },
+                          expression: "phone"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: {
+                            disabled: !_vm.customerDataOk,
+                            color: "primary"
+                          },
+                          on: {
+                            click: function($event) {
+                              _vm.e1 = 2
+                            }
+                          }
+                        },
+                        [_vm._v("\n        Continue\n      ")]
+                      ),
+                      _vm._v(" "),
+                      _c("v-btn", { attrs: { flat: "" } }, [_vm._v("Cancel")])
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-stepper-content",
+                    { attrs: { step: "2" } },
+                    [
+                      _vm._l(_vm.allMarks, function(mark) {
+                        return [
+                          _c(
+                            "div",
+                            { attrs: { dir: "rtl" } },
+                            [
+                              _c("h1", { staticClass: "indigo--text" }, [
+                                _vm._v(
+                                  "\n           " +
+                                    _vm._s(mark.name) +
+                                    "\n         "
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _vm._l(mark.stock, function(item, index) {
+                                return [
+                                  _c(
+                                    "v-flex",
+                                    { attrs: { xs3: "" } },
+                                    [
+                                      _c("v-divider", { staticClass: "ma-3" }),
+                                      _vm._v(" "),
+                                      _c("v-checkbox", {
+                                        attrs: {
+                                          color: "indigo",
+                                          label: "John",
+                                          value: item.id
+                                        },
+                                        scopedSlots: _vm._u(
+                                          [
+                                            {
+                                              key: "label",
+                                              fn: function() {
+                                                return [
+                                                  _c(
+                                                    "bdi",
+                                                    {
+                                                      staticClass: "black--text"
+                                                    },
+                                                    [
+                                                      _vm._v(
+                                                        "\n                          فرزة " +
+                                                          _vm._s(
+                                                            item.filter_id
+                                                          ) +
+                                                          " - " +
+                                                          _vm._s(item.color) +
+                                                          " - مقاس " +
+                                                          _vm._s(
+                                                            item.dimension
+                                                          ) +
+                                                          "\n                      "
+                                                      )
+                                                    ]
+                                                  )
+                                                ]
+                                              },
+                                              proxy: true
+                                            }
+                                          ],
+                                          null,
+                                          true
+                                        ),
+                                        model: {
+                                          value: _vm.selectedItems,
+                                          callback: function($$v) {
+                                            _vm.selectedItems = $$v
+                                          },
+                                          expression: "selectedItems"
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _vm.selectedItems.indexOf(item.id) > -1
+                                        ? _c("v-text-field", {
+                                            attrs: {
+                                              hint:
+                                                "سعر المتر  : " +
+                                                item.price +
+                                                " جنيه - السعة: " +
+                                                item.size +
+                                                " متر",
+                                              rules: _vm.nameRules,
+                                              width: "120",
+                                              label: "الكمية بالكرتونة",
+                                              "solo-inverted": ""
+                                            },
+                                            on: {
+                                              keyup: function($event) {
+                                                _vm.calculateTotal(
+                                                  item.id,
+                                                  item.price,
+                                                  item.size,
+                                                  _vm.selectedItemsModel[
+                                                    _vm.selectedItems.indexOf(
+                                                      item.id
+                                                    )
+                                                  ]
+                                                )
+                                              }
+                                            },
+                                            model: {
+                                              value:
+                                                _vm.selectedItemsModel[
+                                                  _vm.selectedItems.indexOf(
+                                                    item.id
+                                                  )
+                                                ],
+                                              callback: function($$v) {
+                                                _vm.$set(
+                                                  _vm.selectedItemsModel,
+                                                  _vm.selectedItems.indexOf(
+                                                    item.id
+                                                  ),
+                                                  $$v
+                                                )
+                                              },
+                                              expression:
+                                                "selectedItemsModel[selectedItems.indexOf(item.id)]"
+                                            }
+                                          })
+                                        : _vm._e(),
+                                      _vm._v(" "),
+                                      _vm.selectedItems.indexOf(item.id) > -1
+                                        ? _c("h5", [
+                                            _c("bdi", [
+                                              _vm._v(
+                                                "\n                        السعر :\n                        "
+                                              ),
+                                              _c(
+                                                "span",
+                                                { staticClass: "green--text" },
+                                                [
+                                                  _vm._v(
+                                                    "\n                            " +
+                                                      _vm._s(
+                                                        isNaN(
+                                                          _vm
+                                                            .selectedItemsModel[
+                                                            _vm.selectedItems.indexOf(
+                                                              item.id
+                                                            )
+                                                          ] *
+                                                            item.size *
+                                                            item.price
+                                                        )
+                                                          ? 0
+                                                          : _vm
+                                                              .selectedItemsModel[
+                                                              _vm.selectedItems.indexOf(
+                                                                item.id
+                                                              )
+                                                            ] *
+                                                              item.size *
+                                                              item.price
+                                                      ) +
+                                                      "\n                        "
+                                                  )
+                                                ]
+                                              )
+                                            ])
+                                          ])
+                                        : _vm._e()
+                                    ],
+                                    1
+                                  )
+                                ]
+                              }),
+                              _vm._v(" "),
+                              _c("v-divider")
+                            ],
+                            2
+                          )
+                        ]
+                      }),
+                      _vm._v(" "),
+                      _c("v-text-field", {
+                        attrs: { label: "المدفوع", outline: "" },
+                        model: {
+                          value: _vm.paid,
+                          callback: function($$v) {
+                            _vm.paid = $$v
+                          },
+                          expression: "paid"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("v-text-field", {
+                        attrs: {
+                          readonly: "",
+                          value: _vm.total,
+                          label: "الاجمالي",
+                          outline: ""
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("v-text-field", {
+                        attrs: {
+                          readonly: "",
+                          value: _vm.remain,
+                          label: "المتبقي",
+                          outline: ""
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "text-xs-center" },
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              staticClass: "indigo white--text",
+                              attrs: { disabled: !_vm.allFilled },
+                              on: { click: _vm.createNewBill }
+                            },
+                            [_vm._v(" انشاء")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    2
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        : _vm._e()
     ],
-    2
+    1
   )
 }
 var staticRenderFns = []

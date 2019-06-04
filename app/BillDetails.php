@@ -14,4 +14,9 @@ class BillDetails extends Model
       return $this->belongsTo('App\Bill');
     }
 
+    public function stock()
+    {
+      return $this->hasMany('App\Stock');
+    }
+
 }

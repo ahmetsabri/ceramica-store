@@ -26,10 +26,19 @@ Route::post('/get-stock','StockController@get_stock')->name('getstock');
 Route::group(['prefix'=>'bill'],function(){
 
 
-Route::post('/create','BillController@store')->name('bill.store');
-Route::post('/delete','BillController@delete_bill')->name('bill.delete');
-Route::get('/edit','BillController@edit_bill')->name('bill.edit');
-//fetch customer_id
-Route::post('/search-customer','BillController@search_customer')->name('customer.read');
+  Route::post('/create','BillController@store')->name('bill.store');
+  Route::post('/delete','BillController@delete_bill')->name('bill.delete');
+  Route::get('/edit','BillController@edit_bill')->name('bill.edit');
+  //fetch customer_id
+  Route::post('/search-customer','BillController@search_customer')->name('customer.read');
+  //update bills
+  Route::post('/edit-bill','BillController@edit_bill')->name('bill.edit');
+
+  Route::post('/show-details','BillController@show_bill_details')->name('details.show');
+
+  Route::post('/edit-details','BillController@edit_bill_details')->name('details.edit');
+
+  Route::post('/delete-details','BillController@delete_bill_details')->name('details.delete');
+
 
 });

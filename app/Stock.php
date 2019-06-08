@@ -14,7 +14,7 @@ class Stock extends Model
     }
     public function bill_detail()
     {
-      return $this->belongsTo('App\BillDeatils');
+      return $this->hasMany('App\BillDeatils')->with('marks');
     }
 
 

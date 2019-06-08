@@ -3,6 +3,7 @@ import Mark from './components/Mark.vue';
 import Stock from './components/Stock.vue';
 import Bills from './components/Bills.vue';
 import Customers from './components/Customers.vue';
+import BillDetails from './components/BillDetails.vue';
 export const routes = [
 
   {
@@ -20,6 +21,11 @@ export const routes = [
   {
     path:'/stock',
     component:Stock,
+  },
+  {
+    path:'/details/:id',
+    component:BillDetails,
+    name:'show-bill-details',
   },
 
 ]

@@ -63,14 +63,18 @@
 
                   <v-text-field
                     solo-inverted
+                    placeholder="المقاس مثال 20 *20"
+                    v-model="dimensions"
+                  ></v-text-field>
 
+                  <v-text-field
+                    solo-inverted
                     placeholder="السعة المترية"
                     v-model="sizeInMeter"
                   ></v-text-field>
 
                   <v-text-field
                     solo-inverted
-
                     placeholder="السعر للمتر"
                     v-model="priceForMeter"
                   ></v-text-field>
@@ -99,8 +103,6 @@
           <div class="pa-3 ma-3">
               <v-form>
                   <v-select
-
-
                     solo-inverted
                     :items="allMarks"
                     item-text="name"
@@ -112,7 +114,6 @@
 
                   <v-select
                     solo-inverted
-
                       :items="allFilters"
                     item-text="name"
                     item-value="name"
@@ -130,14 +131,18 @@
 
                   <v-text-field
                     solo-inverted
-
                     placeholder="الكمية بالكرتونة"
                     v-model="quantityInBox"
                   ></v-text-field>
 
                   <v-text-field
                     solo-inverted
+                    placeholder="المقاس"
+                    v-model="dimensions"
+                  ></v-text-field>
 
+                  <v-text-field
+                    solo-inverted
                     placeholder="السعة المترية"
                     v-model="sizeInMeter"
                   ></v-text-field>
@@ -219,6 +224,7 @@ export default {
       sizeInMeter:'',
       priceForMeter:'',
       selectedFilter:'',
+      dimensions:'',
       done:false,
       selectedId:null,
       stock:[],
@@ -302,13 +308,21 @@ export default {
     },
 
     addStock(){
+      let index = this.allMarks.findIndex((val)=>{
+          return val.id == this.selectedMark;
+      });
+      this.selectedMarkName = this.allMarks[index]['name'];
+
       axios.post('/api/stock/create',{
         mark_id:this.selectedMark,
+        mark_name:this.selectedMarkName,
+        dimension:this.dimensions,
         filter_id:this.selectedFilter,
         quantity:this.quantityInBox,
         color:this.selctedColor,
         size:this.sizeInMeter,
         price:this.priceForMeter,
+
       })
       .then((response)=>{
           console.log(response.data);
@@ -357,13 +371,22 @@ export default {
       this.selctedColor = this.selectedId.color;
       this.sizeInMeter = this.selectedId.size;
       this.priceForMeter = this.selectedId.price;
+      this.dimensions=this.selectedId.dimension;
+
       this.showEditModal = true;
     },
 
     applyEditStock(){
+      let index = this.allMarks.findIndex((val)=>{
+          return val.id == this.selectedId.id;
+      });
+      this.selectedMarkName = this.allMarks[index]['name'];
+
         axios.post('/api/stock/edit',{
           id:this.selectedId.id,
           mark_id:this.selectedMark,
+          mark_name:this.selectedMarkName,
+          dimension:this.dimensions,
           filter_id:this.selectedFilter,
           quantity:this.quantityInBox,
           color:this.selctedColor,

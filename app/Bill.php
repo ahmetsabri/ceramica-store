@@ -15,6 +15,6 @@ class Bill extends Model
 
     public function details()
     {
-      return $this->hasMany('App\BillDetails');
+      return $this->hasMany('App\BillDetails')->with('stock');
     }
 }

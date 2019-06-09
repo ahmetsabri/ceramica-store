@@ -55,12 +55,6 @@ class StockController extends Controller
     }
     public function read(Request $request)
     {
-
-      // if ($request->has('for_details')) {
-      // $details_id = $request->detail_id;
-      //   $stocks_id = BillDetails::whereId($details_id)->pluck('stock_id');
-      //   $mark = Mark::with('stock')->whereNotIn('id',$stocks_id)->get();
-      // }
       $mark = Mark::with('stock')->get();
       $stock = Stock::with('mark')->where('quantity','>',0)->get();
 

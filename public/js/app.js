@@ -2777,7 +2777,6 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/search-customer', data).then(function (response) {
         console.log(response.data);
         _this4.searchResults = response.data.customer;
-        _this4.loading = false;
       })["catch"](function (errors) {
         console.log(errors);
         console.log(errors.response);

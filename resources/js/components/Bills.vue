@@ -611,8 +611,6 @@ export default {
       .then((response)=>{
         console.log(response.data);
           this.searchResults = response.data.customer;
-          this.loading = false;
-
       })
       .catch((errors)=>{
         console.log(errors);

@@ -17,6 +17,12 @@
       app
       >
               <v-list two-line>
+                <v-list-tile router to="/marks">
+                  <h3>
+                    <v-icon>loyalty</v-icon>
+                    الماركات
+                  </h3>
+                </v-list-tile>
                 <v-list-tile router to="/stock">
                   <h3>
                     <v-icon>store</v-icon>
@@ -24,12 +30,6 @@
                   </h3>
                 </v-list-tile>
 
-                <v-list-tile router to="/marks">
-                  <h3>
-                    <v-icon>loyalty</v-icon>
-                    الماركات
-                  </h3>
-                </v-list-tile>
 
                 <v-list-tile router to="/bills">
                   <h3>

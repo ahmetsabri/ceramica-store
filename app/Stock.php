@@ -8,10 +8,11 @@ class Stock extends Model
 {
     protected $guarded = [];
 
-    public function marks()
+    public function mark()
     {
       return $this->belongsTo('App\Mark');
     }
+    
     public function bill_detail()
     {
       return $this->hasMany('App\BillDeatils')->with('marks');

@@ -4,10 +4,10 @@
       بسم الله الرحمن الرحيم
     </h1>
     <div class="text-xs-center">
-      <v-btn large round @click="newCustomer = false" class="indigo white--text">عميل حالي</v-btn>
-        <v-btn large @click="createNewCutsotemr" class="indigo white--text" round>عميل جديد</v-btn>
+      <v-btn :loading="loading" large round @click="newCustomer = false" class="indigo white--text">عميل حالي</v-btn>
+        <v-btn :loading="loading" large @click="createNewCutsotemr" class="indigo white--text" round>عميل جديد</v-btn>
         <v-text-field v-if="!newCustomer" placeholder="بحث عن عميل" solo-inverted v-model="search"></v-text-field>
-        <v-list dark v-if="searchResults.length > 0">
+        <v-list dark v-if="searchResults.length > 0" v-show="!selectedCustomer">
             <template v-for="result in searchResults">
 
           <v-list-tile @click="showCustomer(result.id)">
@@ -18,13 +18,15 @@
         </v-list>
         <h1 class="text-xs-center" v-if="!!selectedCustomer">البيانات الخاصة بالعميل</h1>
         <v-data-table
+          dark
           v-if="!!selectedCustomer"
           :headers="headers"
           :items="selectedCustomer"
           hide-actions>
                 <template v-slot:items="props">
                   <td class="text-xs-center">
-                    <h4>                    {{props.item.address}}
+                    <h4>
+                        {{props.item.address}}
 </h4>
                   </td>
                   <td class="text-xs-center">
@@ -38,7 +40,13 @@
                   </td>
                 </template>
         </v-data-table>
-        <h1 class="text-xs-center ma-3" v-if="!!selectedCustomerBills">الفواتير الخاصة به</h1>
+        <h1 class="text-xs-center ma-3" v-if="!!selectedCustomerBills">الفواتير</h1>
+        <v-btn :loading="loading" color="info white--text" @click="pushToNewBill" v-if="!!selectedCustomerBills" round small>
+          <bdi>
+            فاتورة جديدة
+            <v-icon small>add</v-icon>
+          </bdi>
+         </v-btn>
         <v-data-table
           v-if="!!selectedCustomerBills"
           :headers="billsHeaders"
@@ -51,10 +59,10 @@
 
 
             <td class="text-xs-center">
-              <v-btn round class="indigo white--text" @click="()=>editBill(props.item.id)">تعديل</v-btn>
+              <v-btn :loading="loading" round class="indigo white--text" @click="()=>editBill(props.item.id)">تعديل</v-btn>
             </td>
             <td class="text-xs-center">
-              <v-btn round class="indigo white--text" @click="()=>showBill(props.item.id)"> عرض التفاصيل</v-btn>
+              <v-btn :loading="loading" round class="indigo white--text" @click="()=>showBill(props.item.id)"> عرض التفاصيل</v-btn>
             </td>
 
             <td class="text-xs-center">
@@ -71,24 +79,20 @@
               </h3>
             </td>
 
-
-
             <td class="text-xs-center">
-              <h3>
-
+              <h3 class="red--text">
               {{props.item.remain}}
             </h3>
             </td>
 
             <td class="text-xs-center">
-              <h3>
+              <h3 class="info--text">
               {{props.item.paid}}
             </h3>
             </td>
 
             <td class="text-xs-center">
-              <h3>
-
+              <h3 class="success--text">
                 {{props.item.total}}
               </h3>
             </td>
@@ -136,24 +140,23 @@
 
             >
             </v-text-field>
-        <v-btn
+        <v-btn :loading="loading"
           :disabled="!customerDataOk"
           color="primary"
           @click="e1 = 2">
           Continue
         </v-btn>
 
-        <v-btn flat>Cancel</v-btn>
+        <v-btn :loading="loading" flat>Cancel</v-btn>
       </v-stepper-content>
 
       <v-stepper-content step="2">
-        <template v-for="mark in allMarks">
+        <template v-for="item in allMarks">
           <div dir="rtl">
           <h1 class="indigo--text">
-             {{mark.name}}
+             {{item.mark.name}}
            </h1>
 
-            <template v-for="(item,index) in mark.stock">
               <v-flex xs3>
                 <v-divider class="ma-3"></v-divider>
                     <v-checkbox color="indigo" v-model="selectedItems" label="John" :value="item.id">
@@ -169,11 +172,17 @@
                       width="120"
                       v-if="selectedItems.indexOf(item.id) > -1"
                       v-model="selectedItemsModel[selectedItems.indexOf(item.id)]"
-                      @keyup="calculateTotal(item.id,item.price , item.size , selectedItemsModel[selectedItems.indexOf(item.id)])"
+                      @keyup="calculateTotal(item.id,item.price , item.size , selectedItemsModel[selectedItems.indexOf(item.id)],item.quantity)"
                       label="الكمية بالكرتونة"
                       solo-inverted>
 
                       </v-text-field>
+                      <h3
+                      class="error--text"
+                      v-show="selectedItemsModel[selectedItems.indexOf(item.id)] > item.quantity" >
+                          الكمية اكبر من الكمية الموجودة في المخزن
+                      </h3>
+
                       <h5 v-if="selectedItems.indexOf(item.id) > -1">
                         <bdi>
                           السعر :
@@ -184,7 +193,6 @@
 
                     </h5>
                     </v-flex>
-            </template>
             <v-divider></v-divider>
           </div>
         </template>
@@ -192,7 +200,7 @@
         <v-text-field readonly :value="total"  label="الاجمالي" outline></v-text-field>
         <v-text-field readonly :value="remain"  label="المتبقي" outline></v-text-field>
         <div class="text-xs-center">
-          <v-btn @click="createNewBill" class="indigo white--text" :disabled="!allFilled"> انشاء</v-btn>
+          <v-btn :loading="loading" @click="createNewBill" class="indigo white--text" :disabled="!allFilled || bigQuantity"> انشاء</v-btn>
         </div>
       </v-stepper-content>
     </v-stepper-items>
@@ -203,8 +211,12 @@
     max-width="500px"
     v-if="!!selectedBill"
     transition="dialog-transition">
-    <div class="ma-3">
       <v-card>
+
+        <v-card-title primary-title class="indigo white--text">
+          <h1>تعديل </h1>
+        </v-card-title>
+        <div class="ma-3">
         <v-text-field
           label="الاجمالي"
           :value="selectedBill.total"
@@ -228,12 +240,22 @@
           >
 
           </v-text-field>
-          <div class="text-xs-center">
-              <v-btn :disabled="addPaid === 0 || currentRemain < 0" round class="success white--text" @click="applyEditBill"> حفظ </v-btn>
-          </div>
+
+        </div>
+        <div class="text-xs-center">
+            <v-btn :loading="loading" :disabled="addPaid === 0 || currentRemain < 0" round class="success white--text" @click="applyEditBill"> حفظ </v-btn>
+        </div>
       </v-card>
-    </div>
   </v-dialog>
+  <v-snackbar
+    v-model="done"
+    bottom
+    right>
+  <b>
+       تم بنجاح
+     </b>
+    <v-btn :loading="loading" class="green--text" flat dark @click.native="done = false">حسناً</v-btn>
+  </v-snackbar>
   </v-content>
 </template>
 
@@ -244,8 +266,12 @@
 export default {
   data(){
     return {
+      loading:false,
+      done:false,
+      bigQuantity:false,
       search:"",
       showDialoge:false,
+      forCurrentUser:false,
       billsHeaders:[
         {'text':'تعديل','align':'center','value':'id'},
         {'text':'تفاصيل الفاتورة','align':'center','value':'id'},
@@ -338,8 +364,6 @@ export default {
               this.total = 0;
               this.paid = 0;
               this.remain = 0;
-
-
             }
 
           }
@@ -350,6 +374,7 @@ export default {
         }
         if (n.length > 0) {
         this.searchCustomer();
+        this.selectedCustomer = null;
       }
 
       }
@@ -374,13 +399,14 @@ export default {
     },
     applyEditBill(){
       console.log(this.selectedBill.id);
-
+      this.loading = true;
       axios.post('/api/bill/edit-bill',{
         id:this.selectedBill.id,
         paid:this.addPaid,
         remain:this.currentRemain,
       })
       .then((response)=>{
+
         console.log(response.data.current_bill);
         let index = this.selectedCustomer[0]['bills'].findIndex((val)=>{
             return val.id == this.selectedBill.id;
@@ -388,12 +414,18 @@ export default {
 
       this.selectedCustomer[0]['bills'][index]['paid'] = response.data.current_bill.paid;
       this.selectedCustomer[0]['bills'][index]['remain'] = response.data.current_bill.remain;
+      this.showDialoge = false;
+      this.done = true;
+
+      this.loading = false;
       })
       .catch((errors)=>{
         alert('error in update bill');
         console.log(errors);
         console.log(errors.response);
         console.log(errors.response.data);
+        this.loading = false;
+
       })
     },
     createNewCutsotemr(){
@@ -416,7 +448,19 @@ export default {
           this.selectedCustomerBills = this.selectedCustomer[0]['bills'];
           console.log(this.selectedCustomerBills);
       },
-    calculateTotal(id,price,size,quantity){
+      pushToNewBill(){
+        this.forCurrentUser =true;
+        this.e1 = 2;
+        this.searchResults = [];
+        this.name = this.selectedCustomer[0].name;
+        this.address = this.selectedCustomer[0].address;
+        this.phone = this.selectedCustomer[0].phone;
+        this.newCustomer = true;
+        this.selectedCustomerBills = null;
+        this.search = '';
+
+      },
+    calculateTotal(id,price,size,quantity,allQuantity){
 
         let index = this.selectedItems.indexOf(id);
 
@@ -427,31 +471,44 @@ export default {
               });
 
 
-        console.log(this.selectedItems);
-        console.log(this.totalSum);
-        console.log(sum);
         this.total = sum;
 
         this.remain = this.total - this.paid;
+
+        if (quantity > allQuantity || quantity <= 0) {
+            this.bigQuantity = true;
+        }
+        else{
+          this.bigQuantity = false;
+        }
+
       },
 
     loadStock(){
+      this.loading = true;
+
       axios.post('/api/stock/read',{
       })
       .then((response)=>{
         console.log(response.data.marks);
+        this.loading = false;
 
-        this.allMarks = response.data.marks ;
+        this.allMarks = response.data.stock ;
 
        })
       .catch((errors)=>{
         alert('error in loading marks');
         console.log(errors);
+        this.loading = false;
+
         console.log(errors.response);
       })
     },
 
     createNewBill(){
+      this.loading = true;
+
+      if (!this.forCurrentUser) {
 
       axios.post('/api/bill/create',{
         name:this.name,
@@ -460,30 +517,102 @@ export default {
         remain:this.remain,
         total:this.total,
         paid:this.paid,
-
         stock:this.selectedItems,
         quantity:this.selectedItemsModel,
 
       })
       .then((response)=>{
         console.log(response.data);
+        this.done = true;
+        this.newCustomer=false;
+        this.e1=0;
+        this.selectedCustomer=null;
+        this.selectedCustomerBills=null;
+        this.name='';
+        this.phone='';
+        this.address='';
+        this.selectedItems=[];
+        this.selectedItemsModel=[];
+        this.selectedMarks=[];
+        this.searchResults=[];
+        this.sumTotal=0;
+        this.total=0;
+        this.paid=0;
+        this.total=0;
+        this.remain=0;
+        this.totalSum=[];
+        this.selectedBill=null;
+        this.addPaid=0;
+        this.loading = false;
+
       })
       .catch((errors)=>{
 
         alert('error in create bill');
         console.log(errors);
         console.log(errors.response.data);
+        this.loading = false;
+
 
       })
+    }
+    else{
+      axios.post('/api/bill/create-current',{
+        customer_id:this.selectedCustomer[0].id,
+        remain:this.remain,
+        total:this.total,
+        paid:this.paid,
+        stock:this.selectedItems,
+        quantity:this.selectedItemsModel,
+
+      })
+      .then((response)=>{
+        console.log(response.data);
+        this.done = true;
+        this.newCustomer=false;
+        this.e1=0;
+        this.selectedCustomer=null;
+        this.selectedCustomerBills=null;
+        this.name='';
+        this.phone='';
+        this.address='';
+        this.selectedItems=[];
+        this.selectedItemsModel=[];
+        this.selectedMarks=[];
+        this.searchResults=[];
+        this.sumTotal=0;
+        this.total=0;
+        this.paid=0;
+        this.total=0;
+        this.remain=0;
+        this.totalSum=[];
+        this.selectedBill=null;
+        this.addPaid=0;
+        this.loading = false;
+
+      })
+      .catch((errors)=>{
+
+        alert('error in create bill');
+        console.log(errors);
+        console.log(errors.response.data);
+        this.loading = false;
+
+
+      })
+    }
     },
 
     searchCustomer(){
       let data = {search:this.search} ;
+      this.loading = false;
 
       axios.post('/api/bill/search-customer',data)
       .then((response)=>{
         console.log(response.data);
           this.searchResults = response.data.customer;
+          this.loading = false;
+
       })
       .catch((errors)=>{
         console.log(errors);

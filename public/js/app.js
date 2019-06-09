@@ -1856,48 +1856,122 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
-    return {
+    var _ref;
+
+    return _ref = {
+      done: false,
+      bigQuantity: false,
+      addItem: false,
+      stock: null,
       dialog: false,
       details: null,
       quantity: '',
       selectedDetails: null,
-      headers: [{
-        text: 'الماركة',
-        align: 'center',
-        value: 'id'
-      }, {
-        text: 'الفرزة',
-        align: 'center',
-        value: 'id'
-      }, {
-        text: 'المقاس',
-        align: 'center',
-        value: 'id'
-      }, {
-        text: 'الكمية',
-        align: 'center',
-        value: 'id'
-      }, {
-        text: 'الاجمالي',
-        align: 'center',
-        value: 'id'
-      }, {
-        text: 'السعر للمتر',
-        align: 'center',
-        value: 'id'
-      }, {
-        text: 'السعة المترية',
-        align: 'center',
-        value: 'id'
-      }, {
-        text: 'اجراء',
-        align: 'center',
-        value: 'id'
-      }]
-    };
+      selectedItems: [],
+      selectedItemsModel: [],
+      selectedMarks: [],
+      searchResults: [],
+      allMarks: null,
+      sumTotal: 0,
+      total: 0,
+      paid: 0
+    }, _defineProperty(_ref, "total", 0), _defineProperty(_ref, "remain", 0), _defineProperty(_ref, "totalSum", []), _defineProperty(_ref, "selectedBill", null), _defineProperty(_ref, "addPaid", 0), _defineProperty(_ref, "nameRules", [function (v) {
+      return !!v || 'يجب ملء هذه الخانة';
+    }]), _defineProperty(_ref, "headers", [{
+      text: 'الماركة',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'الفرزة',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'المقاس',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'الكمية',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'الاجمالي',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'السعر للمتر',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'السعة المترية',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'اجراء',
+      align: 'center',
+      value: 'id'
+    }]), _ref;
   },
   computed: {
     id: function id() {
@@ -1906,8 +1980,106 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   created: function created() {
     this.loadDetails();
+    this.loadStock();
   },
-  methods: _defineProperty({
+  watch: {
+    addItem: function addItem() {
+      this.loadStock();
+    },
+    selectedItems: function selectedItems(n, o) {
+      console.log(this.selectedItemsModel);
+
+      if (n.length < o.length) {
+        console.log('old', o);
+        console.log('new', n);
+
+        for (var i = 0; i < o.length; i++) {
+          if (n.indexOf(o[i]) == -1) {
+            this.selectedItemsModel.splice(i, 1);
+            this.totalSum.splice(i, 1);
+          }
+        }
+
+        if (this.totalSum.length > 0) {
+          var sum = this.totalSum.reduce(function (a, b) {
+            return a + b;
+          });
+          this.total = sum;
+        } else {
+          this.total = 0;
+          this.paid = 0;
+        }
+      }
+    }
+  },
+  methods: {
+    calculateTotal: function calculateTotal(id, price, size, quantity, allQuantity) {
+      var index = this.selectedItems.indexOf(id);
+      this.totalSum[index] = price * size * quantity;
+      var sum = this.totalSum.reduce(function (a, b) {
+        return a + b;
+      });
+      console.log(this.selectedItems);
+      console.log(this.totalSum);
+      console.log(sum);
+      this.total = sum;
+      this.remain = this.total - this.paid;
+      console.log(allQuantity);
+
+      if (quantity > allQuantity || quantity <= 0) {
+        this.bigQuantity = true;
+      } else {
+        this.bigQuantity = false;
+      }
+    },
+    addTodetails: function addTodetails() {
+      var self = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/add-to-bill', {
+        bill_id: this.$route.params.id,
+        stock: this.selectedItems,
+        quantity: this.selectedItemsModel,
+        total: this.total
+      }).then(function (response) {
+        console.log(response.data);
+        self.addItem = false;
+        self.stock = null;
+        self.dialog = false;
+        self.quantity = '';
+        self.selectedItems = [];
+        self.selectedItemsModel = [];
+        self.selectedMarks = [];
+        self.searchResults = [];
+        self.allMarks = null;
+        self.sumTotal = 0;
+        self.total = 0;
+        self.paid = 0;
+        self.total = 0;
+        self.remain = 0;
+        self.totalSum = [];
+        self.selectedBill = null;
+        self.addPaid = 0;
+        self.done = true;
+        self.loadDetails();
+      })["catch"](function (errors) {
+        alert('error in loading stock');
+        console.log(errors);
+        console.log(errors.response);
+      });
+    },
+    loadStock: function loadStock() {
+      var _this = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/stock', {
+        bill_id: this.$route.params.id
+      }).then(function (response) {
+        console.log(response.data);
+        _this.stock = response.data.stock;
+      })["catch"](function (errors) {
+        alert('error in loading marks');
+        console.log(errors);
+        console.log(errors.response);
+      });
+    },
     editDetails: function editDetails(id) {
       var index = this.details.findIndex(function (val) {
         return val.id == id;
@@ -1916,46 +2088,76 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.quantity = this.selectedDetails.quantity;
       this.dialog = true;
     },
-    deleteDetails: function deleteDetails(id) {
-      alert(id);
-    },
     applyEditDetail: function applyEditDetail() {
+      var _this2 = this;
+
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/edit-details', {
         quantity: this.quantity,
         detail_id: this.selectedDetails.id,
         bill_id: this.id
       }).then(function (response) {
         console.log(response.data);
+        _this2.dialog = false;
+        _this2.done = true;
       })["catch"](function (errors) {
-        alert('error in details edit');
+        alert('الكمية المدخلة أكبر من الكمية الموجودة في المخزن');
         console.log(errors);
         console.log(errors.response);
       });
     },
     loadDetails: function loadDetails() {
-      var _this = this;
+      var _this3 = this;
 
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/show-details', {
         bill_id: this.$route.params.id
       }).then(function (response) {
-        _this.details = response.data.data;
+        console.log('-2-2-2-2-2--2');
+        console.log(response.data.data);
+        _this3.details = response.data.data;
       })["catch"](function (errors) {
         console.log(errors);
       });
+    },
+    deleteDetails: function deleteDetails(detailId, stockId) {
+      var self = this;
+      var sure = confirm('هل أنت متأكد؟');
+
+      if (sure) {
+        axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/delete-details', {
+          id: detailId,
+          stock_id: stockId,
+          bill_id: this.id
+        }).then(function (response) {
+          self.addItem = false;
+          self.stock = null;
+          self.dialog = false;
+          self.quantity = '';
+          self.selectedItems = [];
+          self.selectedItemsModel = [];
+          self.selectedMarks = [];
+          self.searchResults = [];
+          self.allMarks = null;
+          self.sumTotal = 0;
+          self.total = 0;
+          self.paid = 0;
+          self.total = 0;
+          self.remain = 0;
+          self.totalSum = [];
+          self.selectedBill = null;
+          self.addPaid = 0;
+          var index = self.details.findIndex(function (val) {
+            return val.id == detailId;
+          });
+          self.details.splice(index, 1);
+          self.done = true;
+        })["catch"](function (errors) {
+          alert('errror in delete');
+          console.log(errors);
+          console.log(errors.response);
+        });
+      }
     }
-  }, "deleteDetails", function deleteDetails(detailId, stockId) {
-    axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/delete-details', {
-      id: detailId,
-      stock_id: stockId,
-      bill_id: this.id
-    }).then(function (response) {
-      console.log(response.data);
-    })["catch"](function (errors) {
-      alert('errror in delete');
-      console.log(errors);
-      console.log(errors.response);
-    });
-  })
+  }
 });
 
 /***/ }),
@@ -2212,6 +2414,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
@@ -2221,8 +2445,12 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
     var _ref;
 
     return _ref = {
+      loading: false,
+      done: false,
+      bigQuantity: false,
       search: "",
       showDialoge: false,
+      forCurrentUser: false,
       billsHeaders: [{
         'text': 'تعديل',
         'align': 'center',
@@ -2343,6 +2571,7 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
 
       if (n.length > 0) {
         this.searchCustomer();
+        this.selectedCustomer = null;
       }
     }
   },
@@ -2366,6 +2595,7 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       var _this = this;
 
       console.log(this.selectedBill.id);
+      this.loading = true;
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/edit-bill', {
         id: this.selectedBill.id,
         paid: this.addPaid,
@@ -2379,11 +2609,15 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
 
         _this.selectedCustomer[0]['bills'][index]['paid'] = response.data.current_bill.paid;
         _this.selectedCustomer[0]['bills'][index]['remain'] = response.data.current_bill.remain;
+        _this.showDialoge = false;
+        _this.done = true;
+        _this.loading = false;
       })["catch"](function (errors) {
         alert('error in update bill');
         console.log(errors);
         console.log(errors.response);
         console.log(errors.response.data);
+        _this.loading = false;
       });
     },
     createNewCutsotemr: function createNewCutsotemr() {
@@ -2409,57 +2643,141 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       this.selectedCustomerBills = this.selectedCustomer[0]['bills'];
       console.log(this.selectedCustomerBills);
     },
-    calculateTotal: function calculateTotal(id, price, size, quantity) {
+    pushToNewBill: function pushToNewBill() {
+      this.forCurrentUser = true;
+      this.e1 = 2;
+      this.searchResults = [];
+      this.name = this.selectedCustomer[0].name;
+      this.address = this.selectedCustomer[0].address;
+      this.phone = this.selectedCustomer[0].phone;
+      this.newCustomer = true;
+      this.selectedCustomerBills = null;
+      this.search = '';
+    },
+    calculateTotal: function calculateTotal(id, price, size, quantity, allQuantity) {
       var index = this.selectedItems.indexOf(id);
       this.totalSum[index] = price * size * quantity;
       var sum = this.totalSum.reduce(function (a, b) {
         return a + b;
       });
-      console.log(this.selectedItems);
-      console.log(this.totalSum);
-      console.log(sum);
       this.total = sum;
       this.remain = this.total - this.paid;
+
+      if (quantity > allQuantity || quantity <= 0) {
+        this.bigQuantity = true;
+      } else {
+        this.bigQuantity = false;
+      }
     },
     loadStock: function loadStock() {
       var _this2 = this;
 
+      this.loading = true;
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/stock/read', {}).then(function (response) {
         console.log(response.data.marks);
-        _this2.allMarks = response.data.marks;
+        _this2.loading = false;
+        _this2.allMarks = response.data.stock;
       })["catch"](function (errors) {
         alert('error in loading marks');
         console.log(errors);
+        _this2.loading = false;
         console.log(errors.response);
       });
     },
     createNewBill: function createNewBill() {
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/create', {
-        name: this.name,
-        address: this.address,
-        phone: this.phone,
-        remain: this.remain,
-        total: this.total,
-        paid: this.paid,
-        stock: this.selectedItems,
-        quantity: this.selectedItemsModel
-      }).then(function (response) {
-        console.log(response.data);
-      })["catch"](function (errors) {
-        alert('error in create bill');
-        console.log(errors);
-        console.log(errors.response.data);
-      });
+      var _this3 = this;
+
+      this.loading = true;
+
+      if (!this.forCurrentUser) {
+        axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/create', {
+          name: this.name,
+          address: this.address,
+          phone: this.phone,
+          remain: this.remain,
+          total: this.total,
+          paid: this.paid,
+          stock: this.selectedItems,
+          quantity: this.selectedItemsModel
+        }).then(function (response) {
+          console.log(response.data);
+          _this3.done = true;
+          _this3.newCustomer = false;
+          _this3.e1 = 0;
+          _this3.selectedCustomer = null;
+          _this3.selectedCustomerBills = null;
+          _this3.name = '';
+          _this3.phone = '';
+          _this3.address = '';
+          _this3.selectedItems = [];
+          _this3.selectedItemsModel = [];
+          _this3.selectedMarks = [];
+          _this3.searchResults = [];
+          _this3.sumTotal = 0;
+          _this3.total = 0;
+          _this3.paid = 0;
+          _this3.total = 0;
+          _this3.remain = 0;
+          _this3.totalSum = [];
+          _this3.selectedBill = null;
+          _this3.addPaid = 0;
+          _this3.loading = false;
+        })["catch"](function (errors) {
+          alert('error in create bill');
+          console.log(errors);
+          console.log(errors.response.data);
+          _this3.loading = false;
+        });
+      } else {
+        axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/create-current', {
+          customer_id: this.selectedCustomer[0].id,
+          remain: this.remain,
+          total: this.total,
+          paid: this.paid,
+          stock: this.selectedItems,
+          quantity: this.selectedItemsModel
+        }).then(function (response) {
+          console.log(response.data);
+          _this3.done = true;
+          _this3.newCustomer = false;
+          _this3.e1 = 0;
+          _this3.selectedCustomer = null;
+          _this3.selectedCustomerBills = null;
+          _this3.name = '';
+          _this3.phone = '';
+          _this3.address = '';
+          _this3.selectedItems = [];
+          _this3.selectedItemsModel = [];
+          _this3.selectedMarks = [];
+          _this3.searchResults = [];
+          _this3.sumTotal = 0;
+          _this3.total = 0;
+          _this3.paid = 0;
+          _this3.total = 0;
+          _this3.remain = 0;
+          _this3.totalSum = [];
+          _this3.selectedBill = null;
+          _this3.addPaid = 0;
+          _this3.loading = false;
+        })["catch"](function (errors) {
+          alert('error in create bill');
+          console.log(errors);
+          console.log(errors.response.data);
+          _this3.loading = false;
+        });
+      }
     },
     searchCustomer: function searchCustomer() {
-      var _this3 = this;
+      var _this4 = this;
 
       var data = {
         search: this.search
       };
+      this.loading = false;
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/bill/search-customer', data).then(function (response) {
         console.log(response.data);
-        _this3.searchResults = response.data.customer;
+        _this4.searchResults = response.data.customer;
+        _this4.loading = false;
       })["catch"](function (errors) {
         console.log(errors);
         console.log(errors.response);
@@ -21441,6 +21759,8 @@ var render = function() {
   return _c(
     "v-content",
     [
+      _c("h1", [_vm._v(_vm._s(_vm.total))]),
+      _vm._v(" "),
       !!_vm.details
         ? _c("v-data-table", {
             staticClass: "elevation-1",
@@ -21586,6 +21906,20 @@ var render = function() {
           })
         : _vm._e(),
       _vm._v(" "),
+      _c(
+        "v-btn",
+        {
+          attrs: { round: "", color: "success" },
+          on: {
+            click: function($event) {
+              _vm.addItem = !_vm.addItem
+            }
+          }
+        },
+        [_vm._v("اضافة عنصر"), _c("v-icon", [_vm._v("add")])],
+        1
+      ),
+      _vm._v(" "),
       !!_vm.details
         ? _c(
             "v-dialog",
@@ -21655,9 +21989,223 @@ var render = function() {
             ],
             1
           )
-        : _vm._e()
+        : _vm._e(),
+      _vm._v(" "),
+      _vm._l(_vm.stock, function(item) {
+        return [
+          _c(
+            "div",
+            {
+              directives: [
+                {
+                  name: "show",
+                  rawName: "v-show",
+                  value: _vm.addItem,
+                  expression: "addItem"
+                }
+              ]
+            },
+            [
+              _c("h1", [_vm._v(_vm._s(item.mark.name))]),
+              _vm._v(" "),
+              _c(
+                "v-flex",
+                { attrs: { xs12: "" } },
+                [
+                  _c("v-divider", { staticClass: "ma-3" }),
+                  _vm._v(" "),
+                  _c("v-checkbox", {
+                    attrs: { color: "indigo", label: "John", value: item.id },
+                    scopedSlots: _vm._u(
+                      [
+                        {
+                          key: "label",
+                          fn: function() {
+                            return [
+                              _c("bdi", { staticClass: "black--text" }, [
+                                _vm._v(
+                                  "\n                                فرزة " +
+                                    _vm._s(item.filter_id) +
+                                    " - " +
+                                    _vm._s(item.color) +
+                                    " - مقاس " +
+                                    _vm._s(item.dimension) +
+                                    "\n                            "
+                                )
+                              ])
+                            ]
+                          },
+                          proxy: true
+                        }
+                      ],
+                      null,
+                      true
+                    ),
+                    model: {
+                      value: _vm.selectedItems,
+                      callback: function($$v) {
+                        _vm.selectedItems = $$v
+                      },
+                      expression: "selectedItems"
+                    }
+                  }),
+                  _vm._v(" "),
+                  _vm.selectedItems.indexOf(item.id) > -1
+                    ? _c("v-text-field", {
+                        attrs: {
+                          hint:
+                            "سعر المتر  : " +
+                            item.price +
+                            " جنيه - السعة: " +
+                            item.size +
+                            " متر - الكمية المتاحة " +
+                            item.quantity +
+                            " كرتونة",
+                          rules: _vm.nameRules,
+                          width: "120",
+                          label: "الكمية بالكرتونة",
+                          "solo-inverted": ""
+                        },
+                        on: {
+                          keyup: function($event) {
+                            _vm.calculateTotal(
+                              item.id,
+                              item.price,
+                              item.size,
+                              _vm.selectedItemsModel[
+                                _vm.selectedItems.indexOf(item.id)
+                              ],
+                              item.quantity
+                            )
+                          }
+                        },
+                        model: {
+                          value:
+                            _vm.selectedItemsModel[
+                              _vm.selectedItems.indexOf(item.id)
+                            ],
+                          callback: function($$v) {
+                            _vm.$set(
+                              _vm.selectedItemsModel,
+                              _vm.selectedItems.indexOf(item.id),
+                              $$v
+                            )
+                          },
+                          expression:
+                            "selectedItemsModel[selectedItems.indexOf(item.id)]"
+                        }
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c(
+                    "h3",
+                    {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value:
+                            _vm.selectedItemsModel[
+                              _vm.selectedItems.indexOf(item.id)
+                            ] > item.quantity,
+                          expression:
+                            "selectedItemsModel[selectedItems.indexOf(item.id)] > item.quantity"
+                        }
+                      ],
+                      staticClass: "error--text"
+                    },
+                    [
+                      _vm._v(
+                        "\n                              الكمية اكبر من الكمية الموجودة في المخزن\n                          "
+                      )
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _vm.selectedItems.indexOf(item.id) > -1
+                    ? _c("h5", [
+                        _c("bdi", [
+                          _vm._v(
+                            "\n                              السعر :\n                              "
+                          ),
+                          _c("span", { staticClass: "green--text" }, [
+                            _vm._v(
+                              "\n                                  " +
+                                _vm._s(
+                                  isNaN(
+                                    _vm.selectedItemsModel[
+                                      _vm.selectedItems.indexOf(item.id)
+                                    ] *
+                                      item.size *
+                                      item.price
+                                  )
+                                    ? 0
+                                    : _vm.selectedItemsModel[
+                                        _vm.selectedItems.indexOf(item.id)
+                                      ] *
+                                        item.size *
+                                        item.price
+                                ) +
+                                "\n                              "
+                            )
+                          ])
+                        ])
+                      ])
+                    : _vm._e()
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c("v-divider")
+            ],
+            1
+          )
+        ]
+      }),
+      _vm._v(" "),
+      !!_vm.addItem
+        ? _c(
+            "v-btn",
+            {
+              attrs: { color: "primary", disabled: _vm.bigQuantity },
+              on: { click: _vm.addTodetails }
+            },
+            [_vm._v("اضافة")]
+          )
+        : _vm._e(),
+      _vm._v(" "),
+      _c(
+        "v-snackbar",
+        {
+          attrs: { bottom: "", right: "" },
+          model: {
+            value: _vm.done,
+            callback: function($$v) {
+              _vm.done = $$v
+            },
+            expression: "done"
+          }
+        },
+        [
+          _c("b", [_vm._v("\n                 تم بنجاح\n               ")]),
+          _vm._v(" "),
+          _c(
+            "v-btn",
+            {
+              staticClass: "green--text",
+              attrs: { flat: "", dark: "" },
+              nativeOn: {
+                click: function($event) {
+                  _vm.done = false
+                }
+              }
+            },
+            [_vm._v("حسناً")]
+          )
+        ],
+        1
+      )
     ],
-    1
+    2
   )
 }
 var staticRenderFns = []
@@ -21697,7 +22245,7 @@ var render = function() {
             "v-btn",
             {
               staticClass: "indigo white--text",
-              attrs: { large: "", round: "" },
+              attrs: { loading: _vm.loading, large: "", round: "" },
               on: {
                 click: function($event) {
                   _vm.newCustomer = false
@@ -21711,7 +22259,7 @@ var render = function() {
             "v-btn",
             {
               staticClass: "indigo white--text",
-              attrs: { large: "", round: "" },
+              attrs: { loading: _vm.loading, large: "", round: "" },
               on: { click: _vm.createNewCutsotemr }
             },
             [_vm._v("عميل جديد")]
@@ -21733,7 +22281,17 @@ var render = function() {
           _vm.searchResults.length > 0
             ? _c(
                 "v-list",
-                { attrs: { dark: "" } },
+                {
+                  directives: [
+                    {
+                      name: "show",
+                      rawName: "v-show",
+                      value: !_vm.selectedCustomer,
+                      expression: "!selectedCustomer"
+                    }
+                  ],
+                  attrs: { dark: "" }
+                },
                 [
                   _vm._l(_vm.searchResults, function(result) {
                     return [
@@ -21770,6 +22328,7 @@ var render = function() {
           !!_vm.selectedCustomer
             ? _c("v-data-table", {
                 attrs: {
+                  dark: "",
                   headers: _vm.headers,
                   items: _vm.selectedCustomer,
                   "hide-actions": ""
@@ -21783,7 +22342,7 @@ var render = function() {
                           _c("td", { staticClass: "text-xs-center" }, [
                             _c("h4", [
                               _vm._v(
-                                "                    " +
+                                "\n                        " +
                                   _vm._s(props.item.address) +
                                   "\n"
                               )
@@ -21815,15 +22374,40 @@ var render = function() {
                   ],
                   null,
                   false,
-                  2426413415
+                  3592443349
                 )
               })
             : _vm._e(),
           _vm._v(" "),
           !!_vm.selectedCustomerBills
             ? _c("h1", { staticClass: "text-xs-center ma-3" }, [
-                _vm._v("الفواتير الخاصة به")
+                _vm._v("الفواتير")
               ])
+            : _vm._e(),
+          _vm._v(" "),
+          !!_vm.selectedCustomerBills
+            ? _c(
+                "v-btn",
+                {
+                  attrs: {
+                    loading: _vm.loading,
+                    color: "info white--text",
+                    round: "",
+                    small: ""
+                  },
+                  on: { click: _vm.pushToNewBill }
+                },
+                [
+                  _c(
+                    "bdi",
+                    [
+                      _vm._v("\n            فاتورة جديدة\n            "),
+                      _c("v-icon", { attrs: { small: "" } }, [_vm._v("add")])
+                    ],
+                    1
+                  )
+                ]
+              )
             : _vm._e(),
           _vm._v(" "),
           !!_vm.selectedCustomerBills
@@ -21848,7 +22432,7 @@ var render = function() {
                                 "v-btn",
                                 {
                                   staticClass: "indigo white--text",
-                                  attrs: { round: "" },
+                                  attrs: { loading: _vm.loading, round: "" },
                                   on: {
                                     click: function() {
                                       return _vm.editBill(props.item.id)
@@ -21869,7 +22453,7 @@ var render = function() {
                                 "v-btn",
                                 {
                                   staticClass: "indigo white--text",
-                                  attrs: { round: "" },
+                                  attrs: { loading: _vm.loading, round: "" },
                                   on: {
                                     click: function() {
                                       return _vm.showBill(props.item.id)
@@ -21907,9 +22491,9 @@ var render = function() {
                           ]),
                           _vm._v(" "),
                           _c("td", { staticClass: "text-xs-center" }, [
-                            _c("h3", [
+                            _c("h3", { staticClass: "red--text" }, [
                               _vm._v(
-                                "\n\n              " +
+                                "\n              " +
                                   _vm._s(props.item.remain) +
                                   "\n            "
                               )
@@ -21917,7 +22501,7 @@ var render = function() {
                           ]),
                           _vm._v(" "),
                           _c("td", { staticClass: "text-xs-center" }, [
-                            _c("h3", [
+                            _c("h3", { staticClass: "info--text" }, [
                               _vm._v(
                                 "\n              " +
                                   _vm._s(props.item.paid) +
@@ -21927,9 +22511,9 @@ var render = function() {
                           ]),
                           _vm._v(" "),
                           _c("td", { staticClass: "text-xs-center" }, [
-                            _c("h3", [
+                            _c("h3", { staticClass: "success--text" }, [
                               _vm._v(
-                                "\n\n                " +
+                                "\n                " +
                                   _vm._s(props.item.total) +
                                   "\n              "
                               )
@@ -21941,7 +22525,7 @@ var render = function() {
                   ],
                   null,
                   false,
-                  2852746927
+                  962647274
                 )
               })
             : _vm._e()
@@ -22034,6 +22618,7 @@ var render = function() {
                         "v-btn",
                         {
                           attrs: {
+                            loading: _vm.loading,
                             disabled: !_vm.customerDataOk,
                             color: "primary"
                           },
@@ -22046,7 +22631,11 @@ var render = function() {
                         [_vm._v("\n          Continue\n        ")]
                       ),
                       _vm._v(" "),
-                      _c("v-btn", { attrs: { flat: "" } }, [_vm._v("Cancel")])
+                      _c(
+                        "v-btn",
+                        { attrs: { loading: _vm.loading, flat: "" } },
+                        [_vm._v("Cancel")]
+                      )
                     ],
                     1
                   ),
@@ -22055,7 +22644,7 @@ var render = function() {
                     "v-stepper-content",
                     { attrs: { step: "2" } },
                     [
-                      _vm._l(_vm.allMarks, function(mark) {
+                      _vm._l(_vm.allMarks, function(item) {
                         return [
                           _c(
                             "div",
@@ -22064,170 +22653,181 @@ var render = function() {
                               _c("h1", { staticClass: "indigo--text" }, [
                                 _vm._v(
                                   "\n             " +
-                                    _vm._s(mark.name) +
+                                    _vm._s(item.mark.name) +
                                     "\n           "
                                 )
                               ]),
                               _vm._v(" "),
-                              _vm._l(mark.stock, function(item, index) {
-                                return [
-                                  _c(
-                                    "v-flex",
-                                    { attrs: { xs3: "" } },
-                                    [
-                                      _c("v-divider", { staticClass: "ma-3" }),
-                                      _vm._v(" "),
-                                      _c("v-checkbox", {
-                                        attrs: {
-                                          color: "indigo",
-                                          label: "John",
-                                          value: item.id
-                                        },
-                                        scopedSlots: _vm._u(
-                                          [
-                                            {
-                                              key: "label",
-                                              fn: function() {
-                                                return [
-                                                  _c(
-                                                    "bdi",
-                                                    {
-                                                      staticClass: "black--text"
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        "\n                            فرزة " +
-                                                          _vm._s(
-                                                            item.filter_id
-                                                          ) +
-                                                          " - " +
-                                                          _vm._s(item.color) +
-                                                          " - مقاس " +
-                                                          _vm._s(
-                                                            item.dimension
-                                                          ) +
-                                                          "\n                        "
-                                                      )
-                                                    ]
-                                                  )
-                                                ]
-                                              },
-                                              proxy: true
-                                            }
-                                          ],
-                                          null,
-                                          true
-                                        ),
-                                        model: {
-                                          value: _vm.selectedItems,
-                                          callback: function($$v) {
-                                            _vm.selectedItems = $$v
-                                          },
-                                          expression: "selectedItems"
-                                        }
-                                      }),
-                                      _vm._v(" "),
-                                      _vm.selectedItems.indexOf(item.id) > -1
-                                        ? _c("v-text-field", {
-                                            attrs: {
-                                              hint:
-                                                "سعر المتر  : " +
-                                                item.price +
-                                                " جنيه - السعة: " +
-                                                item.size +
-                                                " متر - الكمية المتاحة " +
-                                                item.quantity +
-                                                " كرتونة",
-                                              rules: _vm.nameRules,
-                                              width: "120",
-                                              label: "الكمية بالكرتونة",
-                                              "solo-inverted": ""
-                                            },
-                                            on: {
-                                              keyup: function($event) {
-                                                _vm.calculateTotal(
-                                                  item.id,
-                                                  item.price,
-                                                  item.size,
-                                                  _vm.selectedItemsModel[
-                                                    _vm.selectedItems.indexOf(
-                                                      item.id
-                                                    )
-                                                  ]
-                                                )
-                                              }
-                                            },
-                                            model: {
-                                              value:
-                                                _vm.selectedItemsModel[
-                                                  _vm.selectedItems.indexOf(
-                                                    item.id
-                                                  )
-                                                ],
-                                              callback: function($$v) {
-                                                _vm.$set(
-                                                  _vm.selectedItemsModel,
-                                                  _vm.selectedItems.indexOf(
-                                                    item.id
-                                                  ),
-                                                  $$v
-                                                )
-                                              },
-                                              expression:
-                                                "selectedItemsModel[selectedItems.indexOf(item.id)]"
-                                            }
-                                          })
-                                        : _vm._e(),
-                                      _vm._v(" "),
-                                      _vm.selectedItems.indexOf(item.id) > -1
-                                        ? _c("h5", [
-                                            _c("bdi", [
-                                              _vm._v(
-                                                "\n                          السعر :\n                          "
-                                              ),
+                              _c(
+                                "v-flex",
+                                { attrs: { xs3: "" } },
+                                [
+                                  _c("v-divider", { staticClass: "ma-3" }),
+                                  _vm._v(" "),
+                                  _c("v-checkbox", {
+                                    attrs: {
+                                      color: "indigo",
+                                      label: "John",
+                                      value: item.id
+                                    },
+                                    scopedSlots: _vm._u(
+                                      [
+                                        {
+                                          key: "label",
+                                          fn: function() {
+                                            return [
                                               _c(
-                                                "span",
-                                                { staticClass: "green--text" },
+                                                "bdi",
+                                                { staticClass: "black--text" },
                                                 [
                                                   _vm._v(
-                                                    "\n                              " +
-                                                      _vm._s(
-                                                        isNaN(
-                                                          _vm
-                                                            .selectedItemsModel[
-                                                            _vm.selectedItems.indexOf(
-                                                              item.id
-                                                            )
-                                                          ] *
-                                                            item.size *
-                                                            item.price
-                                                        )
-                                                          ? 0
-                                                          : _vm
-                                                              .selectedItemsModel[
-                                                              _vm.selectedItems.indexOf(
-                                                                item.id
-                                                              )
-                                                            ] *
-                                                              item.size *
-                                                              item.price
-                                                      ) +
-                                                      "\n                          "
+                                                    "\n                            فرزة " +
+                                                      _vm._s(item.filter_id) +
+                                                      " - " +
+                                                      _vm._s(item.color) +
+                                                      " - مقاس " +
+                                                      _vm._s(item.dimension) +
+                                                      "\n                        "
                                                   )
                                                 ]
                                               )
-                                            ])
-                                          ])
-                                        : _vm._e()
-                                    ],
-                                    1
-                                  )
-                                ]
-                              }),
+                                            ]
+                                          },
+                                          proxy: true
+                                        }
+                                      ],
+                                      null,
+                                      true
+                                    ),
+                                    model: {
+                                      value: _vm.selectedItems,
+                                      callback: function($$v) {
+                                        _vm.selectedItems = $$v
+                                      },
+                                      expression: "selectedItems"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _vm.selectedItems.indexOf(item.id) > -1
+                                    ? _c("v-text-field", {
+                                        attrs: {
+                                          hint:
+                                            "سعر المتر  : " +
+                                            item.price +
+                                            " جنيه - السعة: " +
+                                            item.size +
+                                            " متر - الكمية المتاحة " +
+                                            item.quantity +
+                                            " كرتونة",
+                                          rules: _vm.nameRules,
+                                          width: "120",
+                                          label: "الكمية بالكرتونة",
+                                          "solo-inverted": ""
+                                        },
+                                        on: {
+                                          keyup: function($event) {
+                                            _vm.calculateTotal(
+                                              item.id,
+                                              item.price,
+                                              item.size,
+                                              _vm.selectedItemsModel[
+                                                _vm.selectedItems.indexOf(
+                                                  item.id
+                                                )
+                                              ],
+                                              item.quantity
+                                            )
+                                          }
+                                        },
+                                        model: {
+                                          value:
+                                            _vm.selectedItemsModel[
+                                              _vm.selectedItems.indexOf(item.id)
+                                            ],
+                                          callback: function($$v) {
+                                            _vm.$set(
+                                              _vm.selectedItemsModel,
+                                              _vm.selectedItems.indexOf(
+                                                item.id
+                                              ),
+                                              $$v
+                                            )
+                                          },
+                                          expression:
+                                            "selectedItemsModel[selectedItems.indexOf(item.id)]"
+                                        }
+                                      })
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  _c(
+                                    "h3",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "show",
+                                          rawName: "v-show",
+                                          value:
+                                            _vm.selectedItemsModel[
+                                              _vm.selectedItems.indexOf(item.id)
+                                            ] > item.quantity,
+                                          expression:
+                                            "selectedItemsModel[selectedItems.indexOf(item.id)] > item.quantity"
+                                        }
+                                      ],
+                                      staticClass: "error--text"
+                                    },
+                                    [
+                                      _vm._v(
+                                        "\n                          الكمية اكبر من الكمية الموجودة في المخزن\n                      "
+                                      )
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  _vm.selectedItems.indexOf(item.id) > -1
+                                    ? _c("h5", [
+                                        _c("bdi", [
+                                          _vm._v(
+                                            "\n                          السعر :\n                          "
+                                          ),
+                                          _c(
+                                            "span",
+                                            { staticClass: "green--text" },
+                                            [
+                                              _vm._v(
+                                                "\n                              " +
+                                                  _vm._s(
+                                                    isNaN(
+                                                      _vm.selectedItemsModel[
+                                                        _vm.selectedItems.indexOf(
+                                                          item.id
+                                                        )
+                                                      ] *
+                                                        item.size *
+                                                        item.price
+                                                    )
+                                                      ? 0
+                                                      : _vm.selectedItemsModel[
+                                                          _vm.selectedItems.indexOf(
+                                                            item.id
+                                                          )
+                                                        ] *
+                                                          item.size *
+                                                          item.price
+                                                  ) +
+                                                  "\n                          "
+                                              )
+                                            ]
+                                          )
+                                        ])
+                                      ])
+                                    : _vm._e()
+                                ],
+                                1
+                              ),
                               _vm._v(" "),
                               _c("v-divider")
                             ],
-                            2
+                            1
                           )
                         ]
                       }),
@@ -22269,7 +22869,10 @@ var render = function() {
                             "v-btn",
                             {
                               staticClass: "indigo white--text",
-                              attrs: { disabled: !_vm.allFilled },
+                              attrs: {
+                                loading: _vm.loading,
+                                disabled: !_vm.allFilled || _vm.bigQuantity
+                              },
                               on: { click: _vm.createNewBill }
                             },
                             [_vm._v(" انشاء")]
@@ -22303,11 +22906,20 @@ var render = function() {
             },
             [
               _c(
-                "div",
-                { staticClass: "ma-3" },
+                "v-card",
                 [
                   _c(
-                    "v-card",
+                    "v-card-title",
+                    {
+                      staticClass: "indigo white--text",
+                      attrs: { "primary-title": "" }
+                    },
+                    [_c("h1", [_vm._v("تعديل ")])]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "ma-3" },
                     [
                       _c("v-text-field", {
                         attrs: {
@@ -22336,27 +22948,28 @@ var render = function() {
                           },
                           expression: "addPaid"
                         }
-                      }),
-                      _vm._v(" "),
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "text-xs-center" },
+                    [
                       _c(
-                        "div",
-                        { staticClass: "text-xs-center" },
-                        [
-                          _c(
-                            "v-btn",
-                            {
-                              staticClass: "success white--text",
-                              attrs: {
-                                disabled:
-                                  _vm.addPaid === 0 || _vm.currentRemain < 0,
-                                round: ""
-                              },
-                              on: { click: _vm.applyEditBill }
-                            },
-                            [_vm._v(" حفظ ")]
-                          )
-                        ],
-                        1
+                        "v-btn",
+                        {
+                          staticClass: "success white--text",
+                          attrs: {
+                            loading: _vm.loading,
+                            disabled:
+                              _vm.addPaid === 0 || _vm.currentRemain < 0,
+                            round: ""
+                          },
+                          on: { click: _vm.applyEditBill }
+                        },
+                        [_vm._v(" حفظ ")]
                       )
                     ],
                     1
@@ -22364,9 +22977,42 @@ var render = function() {
                 ],
                 1
               )
-            ]
+            ],
+            1
           )
-        : _vm._e()
+        : _vm._e(),
+      _vm._v(" "),
+      _c(
+        "v-snackbar",
+        {
+          attrs: { bottom: "", right: "" },
+          model: {
+            value: _vm.done,
+            callback: function($$v) {
+              _vm.done = $$v
+            },
+            expression: "done"
+          }
+        },
+        [
+          _c("b", [_vm._v("\n       تم بنجاح\n     ")]),
+          _vm._v(" "),
+          _c(
+            "v-btn",
+            {
+              staticClass: "green--text",
+              attrs: { loading: _vm.loading, flat: "", dark: "" },
+              nativeOn: {
+                click: function($event) {
+                  _vm.done = false
+                }
+              }
+            },
+            [_vm._v("حسناً")]
+          )
+        ],
+        1
+      )
     ],
     1
   )
@@ -22476,14 +23122,14 @@ var render = function() {
                         [
                           _c(
                             "v-list-tile",
-                            { attrs: { router: "", to: "/stock" } },
+                            { attrs: { router: "", to: "/marks" } },
                             [
                               _c(
                                 "h3",
                                 [
-                                  _c("v-icon", [_vm._v("store")]),
+                                  _c("v-icon", [_vm._v("loyalty")]),
                                   _vm._v(
-                                    "\n                 المخزن\n               "
+                                    "\n                 الماركات\n               "
                                   )
                                 ],
                                 1
@@ -22493,14 +23139,14 @@ var render = function() {
                           _vm._v(" "),
                           _c(
                             "v-list-tile",
-                            { attrs: { router: "", to: "/marks" } },
+                            { attrs: { router: "", to: "/stock" } },
                             [
                               _c(
                                 "h3",
                                 [
-                                  _c("v-icon", [_vm._v("loyalty")]),
+                                  _c("v-icon", [_vm._v("store")]),
                                   _vm._v(
-                                    "\n                 الماركات\n               "
+                                    "\n                 المخزن\n               "
                                   )
                                 ],
                                 1

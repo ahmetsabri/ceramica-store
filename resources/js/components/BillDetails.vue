@@ -1,6 +1,6 @@
 <template>
   <v-content>
-
+    <h1>{{total}}</h1>
     <v-data-table
       v-if="!!details"
       :headers="headers"
@@ -62,6 +62,8 @@
       </template>
 
     </v-data-table>
+
+      <v-btn @click="addItem = !addItem"  round color="success">اضافة عنصر<v-icon>add</v-icon></v-btn>
     <v-dialog
       v-if="!!details"
       v-model="dialog"
@@ -84,6 +86,63 @@
           </div>
         </v-card>
     </v-dialog>
+
+    <template  v-for="item in stock" dir="rtl">
+        <div  v-show="addItem">
+
+        <h1>{{item.mark.name}}</h1>
+                  <v-flex xs12>
+                    <v-divider class="ma-3"></v-divider>
+                        <v-checkbox color="indigo" v-model="selectedItems" label="John" :value="item.id">
+                          <template v-slot:label>
+                            <bdi class="black--text">
+                                فرزة {{item.filter_id}} - {{item.color}} - مقاس {{item.dimension}}
+                            </bdi>
+                          </template>
+                        </v-checkbox>
+      <v-text-field
+        :hint="`سعر المتر  : ${item.price} جنيه - السعة: ${item.size} متر - الكمية المتاحة ${item.quantity} كرتونة`"
+       :rules="nameRules"
+        width="120"
+        v-if="selectedItems.indexOf(item.id) > -1"
+        v-model="selectedItemsModel[selectedItems.indexOf(item.id)]"
+        @keyup="calculateTotal(item.id,item.price , item.size , selectedItemsModel[selectedItems.indexOf(item.id)],item.quantity)"
+        label="الكمية بالكرتونة"
+        solo-inverted>
+
+        </v-text-field>
+                          <h3
+                          class="error--text"
+                          v-show="selectedItemsModel[selectedItems.indexOf(item.id)] > item.quantity" >
+                              الكمية اكبر من الكمية الموجودة في المخزن
+                          </h3>
+
+                          <h5 v-if="selectedItems.indexOf(item.id) > -1">
+
+                            <bdi>
+                              السعر :
+                              <span class="green--text">
+                                  {{isNaN(selectedItemsModel[selectedItems.indexOf(item.id)] * item.size * item.price) ? 0 : selectedItemsModel[selectedItems.indexOf(item.id)] * item.size * item.price}}
+                              </span>
+                          </bdi>
+
+                        </h5>
+                        </v-flex>
+                <v-divider></v-divider>
+              </div>
+            </div>
+
+            </template>
+            <v-btn color="primary" :disabled="bigQuantity" v-if="!!addItem" @click="addTodetails">اضافة</v-btn>
+            <v-snackbar
+              v-model="done"
+              bottom
+              right>
+            <b>
+                 تم بنجاح
+               </b>
+              <v-btn class="green--text" flat dark @click.native="done = false">حسناً</v-btn>
+            </v-snackbar>
   </v-content>
 </template>
 
@@ -95,10 +154,30 @@ export default {
 
   data(){
     return {
+      done:false,
+      bigQuantity:false,
+      addItem:false,
+      stock:null,
       dialog:false,
       details:null,
       quantity:'',
       selectedDetails:null,
+      selectedItems:[],
+      selectedItemsModel:[],
+      selectedMarks:[],
+      searchResults:[],
+      allMarks:null,
+      sumTotal:0,
+      total:0,
+      paid:0,
+      total:0,
+      remain:0,
+      totalSum:[],
+      selectedBill:null,
+      addPaid:0,
+      nameRules: [
+            v => !!v || 'يجب ملء هذه الخانة',
+          ],
       headers:[
           {text:'الماركة',align:'center',value:'id'},
           {text:'الفرزة',align:'center',value:'id'},
@@ -114,15 +193,125 @@ export default {
   computed:{
     id(){
       return this.$route.params.id;
-    }
+    },
   },
 
   created(){
       this.loadDetails();
+      this.loadStock();
+
   },
+  watch:{
+    addItem(){
+      this.loadStock();
+    },
+    selectedItems(n,o){
+      console.log(this.selectedItemsModel);
+        if (n.length < o.length) {
+            console.log('old',o);
+            console.log('new',n);
+          for (let i = 0; i < o.length; i++) {
+              if (n.indexOf(o[i])==-1) {
+                    this.selectedItemsModel.splice(i,1);
+                    this.totalSum.splice(i,1)
+              }
+          }
+          if (this.totalSum.length > 0) {
 
+            let sum =  this.totalSum.reduce((a,b)=>{
+                      return a + b;
+                  });
+                  this.total = sum;
+
+          }
+          else{
+            this.total = 0;
+            this.paid = 0;
+          }
+}
+}
+  },
   methods:{
+    calculateTotal(id,price,size,quantity,allQuantity){
 
+        let index = this.selectedItems.indexOf(id);
+
+        this.totalSum[index] = price * size * quantity;
+
+        let sum =  this.totalSum.reduce((a,b)=>{
+                  return a + b;
+              });
+
+
+        console.log(this.selectedItems);
+        console.log(this.totalSum);
+        console.log(sum);
+
+        this.total = sum;
+
+        this.remain = this.total - this.paid;
+          console.log(allQuantity);
+        if (quantity > allQuantity || quantity <= 0) {
+            this.bigQuantity = true;
+        }
+        else{
+          this.bigQuantity = false;
+        }
+      },
+
+    addTodetails(){
+      const self = this;
+      axios.post('/api/bill/add-to-bill',{
+        bill_id:this.$route.params.id,
+        stock:this.selectedItems,
+        quantity:this.selectedItemsModel,
+        total:this.total
+      })
+      .then((response)=>{
+        console.log(response.data);
+
+        self.addItem=false;
+        self.stock=null;
+        self.dialog=false;
+        self.quantity='';
+        self.selectedItems=[];
+        self.selectedItemsModel=[];
+        self.selectedMarks=[];
+        self.searchResults=[];
+        self.allMarks=null;
+        self.sumTotal=0;
+        self.total=0;
+        self.paid=0;
+        self.total=0;
+        self.remain=0;
+        self.totalSum=[];
+        self.selectedBill=null;
+        self.addPaid=0;
+        self.done = true;
+        self.loadDetails();
+
+       })
+      .catch((errors)=>{
+        alert('error in loading stock');
+        console.log(errors);
+        console.log(errors.response);
+      })
+    },
+    loadStock(){
+      axios.post('/api/bill/stock',{
+        bill_id:this.$route.params.id,
+
+      })
+      .then((response)=>{
+        console.log(response.data);
+        this.stock = response.data.stock;
+       })
+      .catch((errors)=>{
+        alert('error in loading marks');
+        console.log(errors);
+        console.log(errors.response);
+      })
+    },
     editDetails(id){
 
       let index = this.details.findIndex((val)=>{
@@ -132,9 +321,7 @@ export default {
       this.quantity = this.selectedDetails.quantity;
       this.dialog = true;
     },
-    deleteDetails(id){
-      alert(id);
-    },
+
     applyEditDetail(){
       axios.post('/api/bill/edit-details',{
         quantity:this.quantity,
@@ -143,9 +330,11 @@ export default {
       })
       .then((response)=>{
         console.log(response.data);
+        this.dialog = false;
+        this.done = true;
       })
       .catch((errors)=>{
-        alert('error in details edit');
+        alert('الكمية المدخلة أكبر من الكمية الموجودة في المخزن');
         console.log(errors);
         console.log(errors.response);
       })
@@ -155,6 +344,8 @@ export default {
           bill_id:this.$route.params.id,
         })
         .then((response)=>{
+          console.log('-2-2-2-2-2--2');
+          console.log(response.data.data);
           this.details = response.data.data
         })
         .catch((errors)=>{
@@ -162,6 +353,9 @@ export default {
         })
     },
     deleteDetails(detailId,stockId){
+      const self = this;
+      let sure = confirm ('هل أنت متأكد؟');
+      if (sure) {
         axios.post('/api/bill/delete-details',{
           id:detailId,
           stock_id:stockId,
@@ -169,14 +363,38 @@ export default {
 
         })
         .then((response)=>{
-          console.log(response.data);
+          self.addItem=false;
+          self.stock=null;
+          self.dialog=false;
+          self.quantity='';
+          self.selectedItems=[];
+          self.selectedItemsModel=[];
+          self.selectedMarks=[];
+          self.searchResults=[];
+          self.allMarks=null;
+          self.sumTotal=0;
+          self.total=0;
+          self.paid=0;
+          self.total=0;
+          self.remain=0;
+          self.totalSum=[];
+          self.selectedBill=null;
+          self.addPaid=0;
+          let index = self.details.findIndex((val)=>{
+            return val.id == detailId;
+          });
+          self.details.splice(index,1);
+          self.done = true;
+
         })
         .catch((errors)=>{
           alert('errror in delete')
           console.log(errors);
           console.log(errors.response);
         })
-    }
+
+      }
+          }
   }
 
 }

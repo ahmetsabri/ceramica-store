@@ -27,6 +27,7 @@ Route::group(['prefix'=>'bill'],function(){
 
 
   Route::post('/create','BillController@store')->name('bill.store');
+  Route::post('/create-current','BillController@store_for_current_custoemr')->name('bill.current');
   Route::post('/delete','BillController@delete_bill')->name('bill.delete');
   Route::get('/edit','BillController@edit_bill')->name('bill.edit');
   //fetch customer_id
@@ -39,6 +40,8 @@ Route::group(['prefix'=>'bill'],function(){
   Route::post('/edit-details','BillController@edit_bill_details')->name('details.edit');
 
   Route::post('/delete-details','BillController@delete_bill_details')->name('details.delete');
+  Route::post('/stock','BillController@get_stock')->name('details.stock');
+  Route::post('/add-to-bill','BillController@add_to_bill')->name('details.add');
 
 
 });

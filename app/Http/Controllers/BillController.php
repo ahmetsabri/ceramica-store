@@ -67,6 +67,48 @@ class BillController extends Controller
       return response()->json(['new_bill'=>$bill],201);
 }
 
+  public function store_for_current_custoemr(Request $request)
+  {
+
+    $validate_datac = $request->validate([
+      'stock'=>'required',
+      'total'=>'required',
+      'paid'=>'required',
+      'remain'=>'required',
+      'customer_id'=>'required'
+
+    ]);
+
+    $customer_id = $request->customer_id;
+
+    $remain = ($request->total) - ($request->paid) ;
+    //Bill data
+    $bill = Bill::create([
+      'customer_id'=>$customer_id,
+      'paid'=>$request->paid,
+      'total'=>$request->total,
+      'remain'=>$request->remain,
+    ]);
+
+    $b_id = $bill->id;
+
+          for ($i=0; $i < count($request->stock); $i++) {
+
+            //Bill details
+            $bill = BillDetails::create([
+              'bill_id'=>$b_id,
+              'stock_id'=>$request->stock[$i],
+              'quantity'=>$request->quantity[$i],
+            ]);
+
+            $stock = Stock::findOrFail($request->stock[$i]);
+            $stock->quantity -=$request->quantity[$i];
+            $stock->save();
+
+          }
+
+  }
+
 
 public function search_customer(Request $request)
 {
@@ -125,14 +167,14 @@ public function search_customer(Request $request)
     if ($quantiy > $detail->quantity) {
 
       //edit details
-      $q_diff = abs($quantiy - $detail->quantity) + $detail->quantity;
+      $q_diff =  abs($quantiy - $detail->quantity)  + $detail->quantity;
       $detail->quantity = $q_diff;
 
       $stock_id = $detail->stock_id;
         $stock = Stock::findOrFail($stock_id);
 
               if ($q_diff > $stock->quantity ) {
-                return response()->json(['msg'=>'الكمية المعطاة اكبر من الموجودة في المخزن'],422);
+                return response()->json(['t'=>'big','msg'=>'الكمية المعطاة اكبر من الموجودة في المخزن'],422);
 
               }
 
@@ -158,13 +200,13 @@ public function search_customer(Request $request)
 
     elseif ($quantiy < $detail->quantity) {
       //edit details
-      $q_diff = abs($quantiy - $detail->quantity) ;
+      $q_diff =  $detail->quantity - $quantiy ;
       $detail->quantity -= $q_diff;
       $stock_id = $detail->stock_id;
       $stock = Stock::findOrFail($stock_id);
 
             if ($q_diff > $stock->quantity ) {
-              return response()->json(['msg'=>'الكمية المعطاة اكبر من الموجودة في المخزن'],422);
+              return response()->json(['dee'=>$stock->quantity,'msg'=>'الكمية المعطاة اكبر من الموجودة في المخزن'],422);
             }
 
       $detail->save();
@@ -215,6 +257,7 @@ public function search_customer(Request $request)
 
         $bill->total -= $edit_total;
 
+        $bill->remain = $bill->total - $bill->paid;
         //done
         $bill->save();
 
@@ -224,5 +267,50 @@ public function search_customer(Request $request)
 
         return response()->json(['msg'=>'deleed'],201);
   }
+
+
+  public function get_stock(Request $request)
+  {
+
+      $bill_id = $request->bill_id;
+
+      $stock_ids = BillDetails::where('bill_id',$bill_id)
+                                ->pluck('stock_id');
+
+
+      $stock = Stock::with('mark')->whereNotIn('id',$stock_ids)->where('quantity','>',0)->get();
+        return response()->json(['stock'=>$stock],200);
+
+  }
+
+  public function add_to_bill(Request $request)
+  {
+    $bill_id = $request->bill_id;
+
+    $total = $request->total;
+    for ($i=0; $i < count($request->stock); $i++) {
+
+      //Bill details
+      $bill = BillDetails::create([
+        'bill_id'=>$bill_id,
+        'stock_id'=>$request->stock[$i],
+        'quantity'=>$request->quantity[$i],
+      ]);
+      $stock = Stock::findOrFail($request->stock[$i]);
+      $stock->quantity -=$request->quantity[$i];
+      $stock->save();
+
+    }
+    $bill = Bill::findOrFail($bill_id);
+
+    $bill->total += $total;
+    $bill->remain = $bill->total - $bill->paid;
+
+    $bill->save();
+
+    return response()->json(['msg'=>$bill->total],201);
+
+  }
+
 
 }

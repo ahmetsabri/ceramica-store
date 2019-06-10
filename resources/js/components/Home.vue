@@ -3,19 +3,17 @@
       <v-container grid-list-md>
         <v-layout row wrap>
           <v-flex xs12>
-      <v-toolbar app dark>
+      <v-toolbar app dark class="hidden-print-only">
       <v-toolbar-side-icon @click="drawer=!drawer"></v-toolbar-side-icon>
       <v-toolbar-title>خيارات</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items class="hidden-sm-and-down">
-
       </v-toolbar-items>
     </v-toolbar>
     <v-navigation-drawer
       v-model="drawer"
       dark
-      app
-      >
+      app>
               <v-list two-line>
                 <v-list-tile router to="/marks">
                   <h3>
@@ -48,14 +46,17 @@
               </v-list>
           </v-navigation-drawer>
         </v-flex>
+
         <v-flex xs12>
           <router-view></router-view>
         </v-flex>
+
         </v-layout>
 
       </v-container>
 
       <v-bottom-nav
+      class="hidden-print-only"
       app
      :active.sync="bottomNav"
      :value="true"

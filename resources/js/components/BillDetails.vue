@@ -1,16 +1,15 @@
 <template>
   <v-content>
-    <h1>{{total}}</h1>
     <v-data-table
       v-if="!!details"
       :headers="headers"
       :items="details"
       hide-actions
-      class="elevation-1">
+      class="hidden-print-only">
       <template v-slot:items="props">
         <td class="text-xs-center">
           <h4>
-            {{props.item.stock.mark_name}}
+            {{props.item.stock.mark.name}}
           </h4>
         </td>
         <td class="text-xs-center">
@@ -63,16 +62,18 @@
 
     </v-data-table>
 
-      <v-btn @click="addItem = !addItem"  round color="success">اضافة عنصر<v-icon>add</v-icon></v-btn>
+      <v-btn class="hidden-print-only"  @click="addItem = !addItem"  round color="success">اضافة عنصر<v-icon>add</v-icon></v-btn>
     <v-dialog
+      class=""
       v-if="!!details"
       v-model="dialog"
       max-width="500px"
       transition="dialog-transition">
         <v-card>
           <v-card-title class="indigo white--text" direction="rtl">
-            <h2 class="text-xs-right">            تعديل
-</h2>
+            <h2 class="text-xs-right">
+                 تعديل
+               </h2>
           </v-card-title>
             <div class="ma-4">
             <v-text-field
@@ -88,7 +89,7 @@
     </v-dialog>
 
     <template  v-for="item in stock" dir="rtl">
-        <div  v-show="addItem">
+        <div  v-show="addItem"  class="">
 
         <h1>{{item.mark.name}}</h1>
                   <v-flex xs12>
@@ -133,16 +134,174 @@
             </div>
 
             </template>
-            <v-btn color="primary" :disabled="bigQuantity" v-if="!!addItem" @click="addTodetails">اضافة</v-btn>
+            <v-btn class="hidden-print-only" color="primary" :disabled="bigQuantity" v-if="!!addItem" @click="addTodetails">اضافة</v-btn>
             <v-snackbar
+              class=""
               v-model="done"
               bottom
               right>
             <b>
                  تم بنجاح
                </b>
-              <v-btn class="green--text" flat dark @click.native="done = false">حسناً</v-btn>
+              <v-btn class="hidden-print-only green--text" flat dark @click.native="done = false">حسناً</v-btn>
             </v-snackbar>
+            <v-container grid-list-xs class="hidden-screen-only">
+
+            <v-layout row wrap>
+              <v-flex xs6>
+                <div class="text-xs-left">
+                    <h4 >
+                      <bdi>
+                        0123456789
+                      </bdi>
+                    </h4>
+                </div>
+              </v-flex>
+              <v-flex xs6>
+                <div class="text-xs-right">
+                    <h4 >
+                      <bdi>
+                        معرض الرحمة للسيراميك - فرع دنشواي
+                      </bdi>
+                    </h4>
+                </div>
+              </v-flex>
+
+        <v-flex xs12>
+            <div class="text-xs-center" v-if="!!customer">
+              <h1>بيانات العميل</h1>
+              <h3>
+                <bdi>
+                    الاسم : {{customer.name}}
+                </bdi>
+              </h3>
+              <h3>
+                <bdi>
+                  العنوان : {{customer.address}}
+                </bdi>
+              </h3>
+              <h3>
+                <bdi>
+                  الهاتف : {{customer.phone}}
+                </bdi>
+              </h3>
+            </div>
+            <v-divider class="black black--text mt-3"></v-divider>
+          </v-flex>
+            <v-flex xs12>
+              <h1 class="text-xs-center">ملخص الفاتورة</h1>
+            </v-flex>
+          <v-flex xs6>
+              <h2 class="text-xs-left">
+                <bdi>
+                  تاريخ اخر عملية دفع :   {{bill.created_at}}
+                </bdi>
+              </h2>
+          </v-flex>
+      <v-flex xs6>
+          <h2 class="text-xs-right">
+            <bdi>
+              تاريخ الشراء :   {{bill.created_at}}
+            </bdi>
+          </h2>
+      </v-flex>
+
+      <v-flex xs4>
+        <div class="text-xs-left mt-4">
+            <h2>
+              <bdi>
+                الباقي : {{bill.remain}}
+              </bdi>
+            </h2>
+        </div>
+      </v-flex>
+      <v-flex xs4>
+        <div class="text-xs-center mt-4">
+            <h2>
+              <bdi>
+                المدفوع : {{bill.paid}}
+              </bdi>
+            </h2>
+        </div>
+      </v-flex>
+      <v-flex xs4>
+        <div class="text-xs-right mt-4">
+            <h2>
+              <bdi>
+                الاجمالي : {{bill.total}}
+              </bdi>
+            </h2>
+        </div>
+      </v-flex>
+      <v-flex xs12>
+        <v-divider class="black black--text mt-3"></v-divider>
+
+      </v-flex>
+      <v-flex xs12>
+          <h1 class="text-xs-center">تفاصيل الفاتورة</h1>
+      </v-flex>
+
+        <v-flex xs12>
+          <v-data-table
+            v-if="!!details"
+            :headers="headersPrint"
+            :items="details"
+            hide-actions
+            class="elevation-1">
+            <template v-slot:items="props">
+              <td class="text-xs-center">
+                <h4>
+                  {{props.item.stock.mark.name}}
+                </h4>
+              </td>
+              <td class="text-xs-center">
+                <h4>
+                  {{props.item.stock.filter_id}}
+                </h4>
+              </td>
+              <td class="text-xs-center">
+                <h4>
+                  {{props.item.stock.dimension}}
+                </h4>
+              </td>
+              <td class="text-xs-center">
+                <h4>
+                  <bdi>
+                    {{props.item.quantity}}
+        كرتونة
+                  </bdi>
+                </h4>
+              </td>
+              <td class="text-xs-center">
+                <h4>
+                <bdi>
+                  {{props.item.quantity * props.item.stock.size * props.item.stock.price }}
+        جنيه
+                </bdi>
+                </h4>
+              </td>
+              <td class="text-xs-center">
+                <h4>
+                  <bdi>
+                    {{props.item.stock.price}}
+        جنيه
+                  </bdi>
+                </h4>
+              </td>
+              <td class="text-xs-center">
+                <h4>
+                  <bdi>
+                    {{props.item.stock.size}}
+        متر
+                  </bdi>
+                </h4>
+              </td>
+            </template>
+          </v-data-table>
+
+        </v-flex>
+        </v-layout>
+      </v-container>
   </v-content>
 </template>
 
@@ -154,6 +313,8 @@ export default {
 
   data(){
     return {
+      customer:null,
+      bill:null,
       done:false,
       bigQuantity:false,
       addItem:false,
@@ -188,6 +349,14 @@ export default {
           {text:'السعة المترية',align:'center',value:'id'},
           {text:'اجراء',align:'center',value:'id'},
       ],
+      headersPrint:[
+          {text:'الماركة',align:'center',value:'id'},
+          {text:'الفرزة',align:'center',value:'id'},
+          {text:'المقاس',align:'center',value:'id'},
+          {text:'الكمية',align:'center',value:'id'},
+          {text:'الاجمالي',align:'center',value:'id'},
+          {text:'السعر للمتر',align:'center',value:'id'},
+          {text:'السعة المترية',align:'center',value:'id'},      ],
     };
   },
   computed:{
@@ -345,8 +514,11 @@ export default {
         })
         .then((response)=>{
           console.log('-2-2-2-2-2--2');
-          console.log(response.data.data);
-          this.details = response.data.data
+          console.log(response.data);
+          this.details = response.data.data;
+          this.customer = response.data.customer;
+          this.bill = response.data.bill;
+
         })
         .catch((errors)=>{
           console.log(errors);
@@ -385,7 +557,7 @@ export default {
           });
           self.details.splice(index,1);
           self.done = true;
-
+          this.loadDetails();
         })
         .catch((errors)=>{
           alert('errror in delete')

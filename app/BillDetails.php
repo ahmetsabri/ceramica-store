@@ -13,10 +13,10 @@ class BillDetails extends Model
     {
       return $this->belongsTo('App\Bill');
     }
-    
+
     public function stock()
     {
-      return $this->belongsTo('App\Stock');
+      return $this->belongsTo('App\Stock')->with('mark');
     }
 
 }

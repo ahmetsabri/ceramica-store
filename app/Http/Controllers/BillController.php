@@ -145,9 +145,12 @@ public function search_customer(Request $request)
 
       $bill_id = $request->bill_id;
 
-      $bill_details = Bill::findOrFail($bill_id)->details;
+      $bill = Bill::findOrFail($bill_id);
+      $bill_details = $bill->details;
+      $bill_customer = $bill->customer;
 
-      return response()->json(['data'=>$bill_details,$bill_id],200);
+
+      return response()->json(['bill'=>$bill,'data'=>$bill_details,'customer'=>$bill_customer,$bill_id],200);
 
 
   }

@@ -1915,12 +1915,173 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     var _ref;
 
     return _ref = {
+      customer: null,
+      bill: null,
       done: false,
       bigQuantity: false,
       addItem: false,
@@ -1969,6 +2130,34 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       value: 'id'
     }, {
       text: 'اجراء',
+      align: 'center',
+      value: 'id'
+    }]), _defineProperty(_ref, "headersPrint", [{
+      text: 'الماركة',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'الفرزة',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'المقاس',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'الكمية',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'الاجمالي',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'السعر للمتر',
+      align: 'center',
+      value: 'id'
+    }, {
+      text: 'السعة المترية',
       align: 'center',
       value: 'id'
     }]), _ref;
@@ -2112,13 +2301,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         bill_id: this.$route.params.id
       }).then(function (response) {
         console.log('-2-2-2-2-2--2');
-        console.log(response.data.data);
+        console.log(response.data);
         _this3.details = response.data.data;
+        _this3.customer = response.data.customer;
+        _this3.bill = response.data.bill;
       })["catch"](function (errors) {
         console.log(errors);
       });
     },
     deleteDetails: function deleteDetails(detailId, stockId) {
+      var _this4 = this;
+
       var self = this;
       var sure = confirm('هل أنت متأكد؟');
 
@@ -2150,6 +2343,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           });
           self.details.splice(index, 1);
           self.done = true;
+
+          _this4.loadDetails();
         })["catch"](function (errors) {
           alert('errror in delete');
           console.log(errors);
@@ -2822,6 +3017,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
 //
 //
 //
@@ -21758,11 +21954,9 @@ var render = function() {
   return _c(
     "v-content",
     [
-      _c("h1", [_vm._v(_vm._s(_vm.total))]),
-      _vm._v(" "),
       !!_vm.details
         ? _c("v-data-table", {
-            staticClass: "elevation-1",
+            staticClass: "hidden-print-only",
             attrs: {
               headers: _vm.headers,
               items: _vm.details,
@@ -21778,7 +21972,7 @@ var render = function() {
                         _c("h4", [
                           _vm._v(
                             "\n            " +
-                              _vm._s(props.item.stock.mark_name) +
+                              _vm._s(props.item.stock.mark.name) +
                               "\n          "
                           )
                         ])
@@ -21900,7 +22094,7 @@ var render = function() {
               ],
               null,
               false,
-              2615759137
+              338945776
             )
           })
         : _vm._e(),
@@ -21908,6 +22102,7 @@ var render = function() {
       _c(
         "v-btn",
         {
+          staticClass: "hidden-print-only",
           attrs: { round: "", color: "success" },
           on: {
             click: function($event) {
@@ -21944,7 +22139,7 @@ var render = function() {
                     },
                     [
                       _c("h2", { staticClass: "text-xs-right" }, [
-                        _vm._v("            تعديل\n")
+                        _vm._v("\n                 تعديل\n               ")
                       ])
                     ]
                   ),
@@ -22165,6 +22360,7 @@ var render = function() {
         ? _c(
             "v-btn",
             {
+              staticClass: "hidden-print-only",
               attrs: { color: "primary", disabled: _vm.bigQuantity },
               on: { click: _vm.addTodetails }
             },
@@ -22190,7 +22386,7 @@ var render = function() {
           _c(
             "v-btn",
             {
-              staticClass: "green--text",
+              staticClass: "hidden-print-only green--text",
               attrs: { flat: "", dark: "" },
               nativeOn: {
                 click: function($event) {
@@ -22199,6 +22395,287 @@ var render = function() {
               }
             },
             [_vm._v("حسناً")]
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-container",
+        { staticClass: "hidden-screen-only", attrs: { "grid-list-xs": "" } },
+        [
+          _c(
+            "v-layout",
+            { attrs: { row: "", wrap: "" } },
+            [
+              _c("v-flex", { attrs: { xs6: "" } }, [
+                _c("div", { staticClass: "text-xs-left" }, [
+                  _c("h4", [
+                    _c("bdi", [
+                      _vm._v(
+                        "\n                        0123456789\n                      "
+                      )
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("v-flex", { attrs: { xs6: "" } }, [
+                _c("div", { staticClass: "text-xs-right" }, [
+                  _c("h4", [
+                    _c("bdi", [
+                      _vm._v(
+                        "\n                        معرض الرحمة للسيراميك - فرع دنشواي\n                      "
+                      )
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "v-flex",
+                { attrs: { xs12: "" } },
+                [
+                  !!_vm.customer
+                    ? _c("div", { staticClass: "text-xs-center" }, [
+                        _c("h1", [_vm._v("بيانات العميل")]),
+                        _vm._v(" "),
+                        _c("h3", [
+                          _c("bdi", [
+                            _vm._v(
+                              "\n                    الاسم : " +
+                                _vm._s(_vm.customer.name) +
+                                "\n                "
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("h3", [
+                          _c("bdi", [
+                            _vm._v(
+                              "\n                  العنوان : " +
+                                _vm._s(_vm.customer.address) +
+                                "\n                "
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("h3", [
+                          _c("bdi", [
+                            _vm._v(
+                              "\n                  الهاتف : " +
+                                _vm._s(_vm.customer.phone) +
+                                "\n                "
+                            )
+                          ])
+                        ])
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c("v-divider", { staticClass: "black black--text mt-3" })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c("v-flex", { attrs: { xs12: "" } }, [
+                _c("h1", { staticClass: "text-xs-center" }, [
+                  _vm._v("ملخص الفاتورة")
+                ])
+              ]),
+              _vm._v(" "),
+              _c("v-flex", { attrs: { xs6: "" } }, [
+                _c("h2", { staticClass: "text-xs-left" }, [
+                  _c("bdi", [
+                    _vm._v(
+                      "\n                  تاريخ اخر عملية دفع :   " +
+                        _vm._s(_vm.bill.created_at) +
+                        "\n                "
+                    )
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("v-flex", { attrs: { xs6: "" } }, [
+                _c("h2", { staticClass: "text-xs-right" }, [
+                  _c("bdi", [
+                    _vm._v(
+                      "\n              تاريخ الشراء :   " +
+                        _vm._s(_vm.bill.created_at) +
+                        "\n            "
+                    )
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("v-flex", { attrs: { xs4: "" } }, [
+                _c("div", { staticClass: "text-xs-left mt-4" }, [
+                  _c("h2", [
+                    _c("bdi", [
+                      _vm._v(
+                        "\n                الباقي : " +
+                          _vm._s(_vm.bill.remain) +
+                          "\n              "
+                      )
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("v-flex", { attrs: { xs4: "" } }, [
+                _c("div", { staticClass: "text-xs-center mt-4" }, [
+                  _c("h2", [
+                    _c("bdi", [
+                      _vm._v(
+                        "\n                المدفوع : " +
+                          _vm._s(_vm.bill.paid) +
+                          "\n              "
+                      )
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("v-flex", { attrs: { xs4: "" } }, [
+                _c("div", { staticClass: "text-xs-right mt-4" }, [
+                  _c("h2", [
+                    _c("bdi", [
+                      _vm._v(
+                        "\n                الاجمالي : " +
+                          _vm._s(_vm.bill.total) +
+                          "\n              "
+                      )
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "v-flex",
+                { attrs: { xs12: "" } },
+                [_c("v-divider", { staticClass: "black black--text mt-3" })],
+                1
+              ),
+              _vm._v(" "),
+              _c("v-flex", { attrs: { xs12: "" } }, [
+                _c("h1", { staticClass: "text-xs-center" }, [
+                  _vm._v("تفاصيل الفاتورة")
+                ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "v-flex",
+                { attrs: { xs12: "" } },
+                [
+                  !!_vm.details
+                    ? _c("v-data-table", {
+                        staticClass: "elevation-1",
+                        attrs: {
+                          headers: _vm.headersPrint,
+                          items: _vm.details,
+                          "hide-actions": ""
+                        },
+                        scopedSlots: _vm._u(
+                          [
+                            {
+                              key: "items",
+                              fn: function(props) {
+                                return [
+                                  _c("td", { staticClass: "text-xs-center" }, [
+                                    _c("h4", [
+                                      _vm._v(
+                                        "\n                  " +
+                                          _vm._s(props.item.stock.mark.name) +
+                                          "\n                "
+                                      )
+                                    ])
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", { staticClass: "text-xs-center" }, [
+                                    _c("h4", [
+                                      _vm._v(
+                                        "\n                  " +
+                                          _vm._s(props.item.stock.filter_id) +
+                                          "\n                "
+                                      )
+                                    ])
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", { staticClass: "text-xs-center" }, [
+                                    _c("h4", [
+                                      _vm._v(
+                                        "\n                  " +
+                                          _vm._s(props.item.stock.dimension) +
+                                          "\n                "
+                                      )
+                                    ])
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", { staticClass: "text-xs-center" }, [
+                                    _c("h4", [
+                                      _c("bdi", [
+                                        _vm._v(
+                                          "\n                    " +
+                                            _vm._s(props.item.quantity) +
+                                            "\n        كرتونة\n                  "
+                                        )
+                                      ])
+                                    ])
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", { staticClass: "text-xs-center" }, [
+                                    _c("h4", [
+                                      _c("bdi", [
+                                        _vm._v(
+                                          "\n                  " +
+                                            _vm._s(
+                                              props.item.quantity *
+                                                props.item.stock.size *
+                                                props.item.stock.price
+                                            ) +
+                                            "\n        جنيه\n                "
+                                        )
+                                      ])
+                                    ])
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", { staticClass: "text-xs-center" }, [
+                                    _c("h4", [
+                                      _c("bdi", [
+                                        _vm._v(
+                                          "\n                    " +
+                                            _vm._s(props.item.stock.price) +
+                                            "\n        جنيه\n                  "
+                                        )
+                                      ])
+                                    ])
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", { staticClass: "text-xs-center" }, [
+                                    _c("h4", [
+                                      _c("bdi", [
+                                        _vm._v(
+                                          "\n                    " +
+                                            _vm._s(props.item.stock.size) +
+                                            "\n        متر\n                  "
+                                        )
+                                      ])
+                                    ])
+                                  ])
+                                ]
+                              }
+                            }
+                          ],
+                          null,
+                          false,
+                          2506148329
+                        )
+                      })
+                    : _vm._e()
+                ],
+                1
+              )
+            ],
+            1
           )
         ],
         1
@@ -23081,7 +23558,10 @@ var render = function() {
                 [
                   _c(
                     "v-toolbar",
-                    { attrs: { app: "", dark: "" } },
+                    {
+                      staticClass: "hidden-print-only",
+                      attrs: { app: "", dark: "" }
+                    },
                     [
                       _c("v-toolbar-side-icon", {
                         on: {
@@ -23207,6 +23687,7 @@ var render = function() {
       _c(
         "v-bottom-nav",
         {
+          staticClass: "hidden-print-only",
           attrs: {
             app: "",
             active: _vm.bottomNav,
